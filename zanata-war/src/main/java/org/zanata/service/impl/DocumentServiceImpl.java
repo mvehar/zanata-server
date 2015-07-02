@@ -110,8 +110,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Inject
     private ApplicationConfiguration applicationConfiguration;
 
-    @Inject(value = JpaIdentityStore.AUTHENTICATED_USER, scope = ScopeType.SESSION,
-            required = false)
+    @Inject
     private HAccount authenticatedAccount;
 
     @Inject
@@ -204,7 +203,7 @@ public class DocumentServiceImpl implements DocumentService {
 
         long actorId = authenticatedAccount.getPerson().getId();
         if (changed) {
-            documentUploadedEvent.fireAfterSuccess(new DocumentUploadedEvent(
+            documentUploadedEvent.fire(new DocumentUploadedEvent(
                     actorId, document.getId(), true, hLocale.getLocaleId()));
             clearStatsCacheForUpdatedDocument(document);
         }

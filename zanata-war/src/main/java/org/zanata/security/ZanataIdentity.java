@@ -50,9 +50,8 @@ import org.zanata.util.ServiceLocator;
 import static org.jboss.seam.ScopeType.SESSION;
 import static org.jboss.seam.annotations.Install.APPLICATION;
 
-@Named("org.jboss.seam.security.identity")
+@Named("zanataIdentity")
 @javax.enterprise.context.SessionScoped
-@Install(precedence = APPLICATION)
 @BypassInterceptors
 /* TODO [CDI] Remove @PostConstruct from startup method and make it accept (@Observes @Initialized ServletContext context) */
 public class ZanataIdentity extends Identity {
