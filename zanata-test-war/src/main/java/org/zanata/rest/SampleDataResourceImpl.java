@@ -12,7 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.jboss.seam.annotations.Transactional;
+
+import org.apache.deltaspike.jpa.api.transaction.Transactional;
 import org.jboss.seam.security.RunAsOperation;
 import org.zanata.common.LocaleId;
 import org.zanata.model.HLocale;
@@ -30,7 +31,6 @@ import com.google.common.util.concurrent.Uninterruptibles;
  *         href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
 @Path("/test/data/sample")
-@Named("sampleProjectResourceImpl")
 @Slf4j
 public class SampleDataResourceImpl implements SampleDataResource {
 

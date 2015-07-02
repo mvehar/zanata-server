@@ -4,11 +4,11 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import org.apache.deltaspike.jpa.api.transaction.Transactional;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.jboss.seam.annotations.Transactional;
 import org.zanata.common.ContentType;
 import org.zanata.common.LocaleId;
 import org.zanata.model.Activity;
@@ -55,7 +55,6 @@ import lombok.extern.slf4j.Slf4j;
  *         href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
 @Slf4j
-@Named("sampleProjectProfile")
 @javax.enterprise.context.ApplicationScoped
 
 @Transactional
