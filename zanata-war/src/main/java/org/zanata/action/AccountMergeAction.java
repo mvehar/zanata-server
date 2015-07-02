@@ -27,11 +27,10 @@ import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.annotation.Nullable;
+import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.enterprise.inject.Produces;
-import org.jboss.seam.contexts.Contexts;
-import org.jboss.seam.security.management.JpaIdentityStore;
 import org.zanata.dao.AccountDAO;
 import org.zanata.model.HAccount;
 import org.zanata.security.AuthenticationManager;
@@ -49,6 +48,13 @@ import org.zanata.util.ServiceLocator;
 @Named("accountMergeAction")
 @javax.faces.bean.ViewScoped
 public class AccountMergeAction implements Serializable {
+
+    @SessionScoped
+    static class ObsoleteHolder implements Serializable {
+        private static final long serialVersionUID = 1L;
+        @Nullable HAccount account;
+    }
+
     private static final long serialVersionUID = 1L;
 
     @Inject /* TODO [CDI] check this: migrated from @In(value = JpaIdentityStore.AUTHENTICATED_USER) */
@@ -67,12 +73,18 @@ public class AccountMergeAction implements Serializable {
     @Setter
     private String openId = "http://";
 
-    @Inject /* TODO [CDI] check this: migrated from @In(required = false, scope = ScopeType.SESSION) */
-    @Produces /* FIXME [CDI] check this: migrated from @Out */(required = false, scope = ScopeType.SESSION)
-    @Getter
-    private HAccount obsoleteAccount;
+    @Inject
+    private ObsoleteHolder obsolete;
 
     private boolean accountsValid;
+
+    public @Nullable HAccount getObsoleteAccount() {
+        return obsolete.account;
+    }
+
+    private void setObsoleteAccount(@Nullable HAccount obsoleteAccount) {
+        obsolete.account = obsoleteAccount;
+    }
 
     public boolean getAccountsValid() {
         return accountsValid;
@@ -100,13 +112,14 @@ public class AccountMergeAction implements Serializable {
     }
 
     public boolean isAccountSelected() {
-        return obsoleteAccount != null;
+        return getObsoleteAccount() != null;
     }
 
     public void validateAccounts() {
         boolean valid = true;
 
         // The account to merge in has been authenticated
+        HAccount obsoleteAccount = getObsoleteAccount();
         if (obsoleteAccount != null) {
             if (obsoleteAccount.getId() == null) {
                 facesMessages.addGlobal(SEVERITY_ERROR,
@@ -125,14 +138,14 @@ public class AccountMergeAction implements Serializable {
 
     public void mergeAccounts() {
         registerServiceImpl
-                .mergeAccounts(authenticatedAccount, obsoleteAccount);
-        obsoleteAccount = null; // reset the obsolete account
+                .mergeAccounts(authenticatedAccount, getObsoleteAccount());
+        setObsoleteAccount(null); // reset the obsolete account
         facesMessages.addGlobal("Your accounts have been merged.");
     }
 
     public void cancel() {
         // see pages.xml
-        obsoleteAccount = null;
+        setObsoleteAccount(null);
     }
 
     private static class AccountMergeAuthCallback implements
@@ -150,9 +163,7 @@ public class AccountMergeAction implements Serializable {
                 if (account == null) {
                     account = new HAccount(); // In case an account is not found
                 }
-                Contexts.getSessionContext().set("obsoleteAccount", account); // Outject
-                                                                              // the
-                                                                              // account
+                ServiceLocator.instance().getInstance(ObsoleteHolder.class).account = account;
             }
         }
 
