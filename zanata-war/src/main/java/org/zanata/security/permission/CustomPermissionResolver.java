@@ -20,19 +20,22 @@
  */
 package org.zanata.security.permission;
 
-import static org.jboss.seam.ScopeType.APPLICATION;
-import static org.jboss.seam.annotations.Install.BUILT_IN;
-
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import org.apache.deltaspike.core.api.exclude.Exclude;
 import org.apache.deltaspike.core.api.projectstage.ProjectStage;
+
+import javax.enterprise.inject.Specializes;
 import javax.inject.Named;
-import org.jboss.seam.annotations.Startup;
-import org.jboss.seam.annotations.intercept.BypassInterceptors;
-import org.jboss.seam.security.permission.PermissionResolver;
+
+import org.picketlink.idm.model.IdentityType;
+import org.picketlink.idm.permission.spi.PermissionResolver;
+import org.picketlink.idm.permission.spi.PermissionVoter;
 import org.zanata.util.ServiceLocator;
 
 /**
@@ -46,14 +49,22 @@ import org.zanata.util.ServiceLocator;
  */
 @Named("customPermissionResolver")
 @javax.enterprise.context.ApplicationScoped
-@BypassInterceptors
-@Install(precedence = BUILT_IN)
-/* TODO [CDI] Remove @PostConstruct from startup method and make it accept (@Observes @Initialized ServletContext context) */
-public class CustomPermissionResolver implements PermissionResolver,
+@Specializes
+public class CustomPermissionResolver extends PermissionResolver implements
         Serializable {
 
+    public CustomPermissionResolver() {
+        super(Collections.<PermissionVoter>emptyList());
+    }
+
     @Override
-    public boolean hasPermission(Object target, String action) {
+    public boolean resolvePermission(IdentityType recipient, Object target, String action) {
+//        assert recipient instanceof ZanataUser;
+        // FIXME change SecurityFunctions' methods to accept account as a parameter.
+        // recipient is ignored: SecurityFunctions currently uses
+        // Identity/HAccount from Session scope.
+
+        // TODO [CDI] abort if recipient does not match session Identity
         Object[] targetArray;
         if (target instanceof MultiTargetList) {
             targetArray = ((MultiTargetList) target).toArray();
@@ -72,12 +83,9 @@ public class CustomPermissionResolver implements PermissionResolver,
     }
 
     @Override
-    public void filterSetByAction(Set<Object> targets, String action) {
-        Iterator iter = targets.iterator();
-        while (iter.hasNext()) {
-            Object target = iter.next();
-            if (hasPermission(target, action))
-                iter.remove();
-        }
+    public boolean resolvePermission(IdentityType recipient,
+            Class<?> resourceClass, Serializable identifier, String operation) {
+        throw new UnsupportedOperationException();
     }
+
 }
