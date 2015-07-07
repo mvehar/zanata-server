@@ -74,8 +74,6 @@ public class TranslationStateCacheImplTest extends ZanataTest {
             .use("cacheContainer", new InfinispanTestCacheContainer())
             .ignoreNonResolvable();
         tsCache = seam.autowire(tsCache);
-
-        tsCache.create();
     }
 
     @Test

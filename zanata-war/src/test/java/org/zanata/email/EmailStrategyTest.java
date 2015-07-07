@@ -107,6 +107,7 @@ public class EmailStrategyTest {
     public EmailStrategyTest() throws UnsupportedEncodingException {
         toAddr = new InternetAddress(toAddress, toName);
         toAddresses = new InternetAddress[] { toAddr };
+        msgs.postConstruct();
     }
 
     @Before

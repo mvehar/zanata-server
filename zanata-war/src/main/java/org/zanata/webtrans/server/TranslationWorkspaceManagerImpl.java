@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Destroy;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Observer;
@@ -72,11 +73,12 @@ import de.novanic.eventservice.service.registry.user.UserManagerFactory;
 public class TranslationWorkspaceManagerImpl implements
         TranslationWorkspaceManager {
 
-    private final ConcurrentHashMap<WorkspaceId, TranslationWorkspace> workspaceMap;
-    private final Multimap<ProjectIterationId, TranslationWorkspace> projIterWorkspaceMap;
-    private final EventRegistry eventRegistry;
+    private ConcurrentHashMap<WorkspaceId, TranslationWorkspace> workspaceMap;
+    private Multimap<ProjectIterationId, TranslationWorkspace> projIterWorkspaceMap;
+    private EventRegistry eventRegistry;
 
-    public TranslationWorkspaceManagerImpl() {
+    @Create
+    public void postConstruct() {
         this.workspaceMap =
                 new ConcurrentHashMap<WorkspaceId, TranslationWorkspace>();
         Multimap<ProjectIterationId, TranslationWorkspace> piwm =

@@ -24,6 +24,7 @@ import com.google.common.base.Throwables;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.AutoCreate;
+import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
@@ -57,7 +58,8 @@ public class CommonMarkRenderer {
     private static final String RESOURCE_NAME = "META-INF/resources/webjars/" +
             SCRIPT_NAME;
 
-    public CommonMarkRenderer() {
+    @Create
+    public void postConstruct() {
         log.info("Using commonmark.js version {}", VER);
         log.info("Using Google Caja version {}", VER_SANITIZER);
     }

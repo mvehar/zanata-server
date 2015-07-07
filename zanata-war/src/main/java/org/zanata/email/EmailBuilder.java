@@ -21,6 +21,7 @@ import com.google.common.base.Throwables;
 import com.googlecode.totallylazy.collections.PersistentMap;
 import lombok.AllArgsConstructor;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -29,6 +30,7 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.log.CommonsLogLogChute;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.jboss.seam.annotations.AutoCreate;
+import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
@@ -51,6 +53,7 @@ import static org.jboss.seam.ScopeType.STATELESS;
  * template and send it via the default JavaMail Transport.
  */
 @AllArgsConstructor
+@NoArgsConstructor
 @AutoCreate
 @Name("emailBuilder")
 @Scope(STATELESS)
@@ -61,12 +64,15 @@ public class EmailBuilder {
     private static final boolean LOG_FULL_MESSAGES = false;
     private static final VelocityEngine velocityEngine = makeVelocityEngine();
 
-    public EmailBuilder() {
-        this.mailSession = MailSession.instance();
+    @Create
+    public void postConstruct() {
+        if (mailSession == null) {
+            mailSession = MailSession.instance();
+        }
     }
 
     // it seems to be impossible to inject this in Seam 2:
-    private final Session mailSession;
+    private Session mailSession;
     @In
     private Context emailContext;
     @In

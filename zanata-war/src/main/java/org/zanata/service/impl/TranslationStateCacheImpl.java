@@ -110,13 +110,11 @@ public class TranslationStateCacheImpl implements TranslationStateCache {
 
     // constructor for Seam
     public TranslationStateCacheImpl() {
-        this(new DocumentStatisticLoader(), new HTextFlowTargetIdLoader(),
-                new HTextFlowTargetValidationLoader());
     }
 
     // Constructor for testing
     @VisibleForTesting
-    public TranslationStateCacheImpl(
+    TranslationStateCacheImpl(
         CacheLoader<DocumentLocaleKey, WordStatistic> documentStatisticLoader,
         CacheLoader<DocumentLocaleKey, DocumentStatus> docStatsLoader,
         CacheLoader<Long, Map<ValidationId, Boolean>> targetValidationLoader) {
@@ -127,6 +125,15 @@ public class TranslationStateCacheImpl implements TranslationStateCache {
 
     @Create
     public void create() {
+        if (documentStatisticLoader == null) {
+            documentStatisticLoader = new DocumentStatisticLoader();
+        }
+        if (docStatusLoader == null) {
+            docStatusLoader = new HTextFlowTargetIdLoader();
+        }
+        if (targetValidationLoader == null) {
+            targetValidationLoader = new HTextFlowTargetValidationLoader();
+        }
         documentStatisticCache =
                 InfinispanCacheWrapper.create(DOC_STATISTIC_CACHE_NAME,
                         cacheContainer, documentStatisticLoader);

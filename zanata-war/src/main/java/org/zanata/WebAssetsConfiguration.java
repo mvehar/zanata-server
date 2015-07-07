@@ -65,7 +65,8 @@ public class WebAssetsConfiguration extends AbstractMap<String, String> {
 
     private String webAssetsUrlBase;
 
-    public WebAssetsConfiguration() {
+    @Create
+    public void postConstruct() {
         String assetsProperty = System.getProperty(ASSETS_PROPERTY_KEY);
 
         /**

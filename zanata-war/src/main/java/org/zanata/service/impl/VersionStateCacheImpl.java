@@ -72,7 +72,6 @@ public class VersionStateCacheImpl implements VersionStateCache {
 
     // constructor for Seam
     public VersionStateCacheImpl() {
-        this(new VersionStatisticLoader());
     }
 
     // Constructor for testing
@@ -83,6 +82,9 @@ public class VersionStateCacheImpl implements VersionStateCache {
 
     @Create
     public void create() {
+        if (versionStatisticLoader == null) {
+            versionStatisticLoader = new VersionStatisticLoader();
+        }
         versionStatisticCache =
                 InfinispanCacheWrapper.create(VERSION_STATISTIC_CACHE_NAME,
                         cacheContainer, versionStatisticLoader);

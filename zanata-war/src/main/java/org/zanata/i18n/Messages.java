@@ -30,6 +30,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.jboss.seam.annotations.AutoCreate;
+import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Observer;
 import org.jboss.seam.annotations.Scope;
@@ -93,25 +94,27 @@ public class Messages extends AbstractMap<String, String> {
         return resourceBundle;
     }
 
-    private final ResourceBundle resourceBundle;
+    private ResourceBundle resourceBundle;
 
     /**
      * Create an instance for the locale of the current request, if any,
      * otherwise the server's default locale.
      */
+    @Create
+    public void postConstruct() {
+        if (resourceBundle == null) {
+            resourceBundle = getResourceBundle();
+        }
+    }
+
     public Messages() {
-        this(getResourceBundle());
     }
 
     /**
      * Create an instance for the specified locale.
      */
     public Messages(java.util.Locale locale) {
-        this(getResourceBundle(locale));
-    }
-
-    private Messages(ResourceBundle resourceBundle) {
-        this.resourceBundle = resourceBundle;
+        this.resourceBundle = getResourceBundle(locale);
     }
 
     @Observer("org.jboss.seam.localeSelected")

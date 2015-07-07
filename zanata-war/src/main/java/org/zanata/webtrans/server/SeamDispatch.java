@@ -17,6 +17,7 @@ import net.customware.gwt.dispatch.shared.Result;
 import net.customware.gwt.dispatch.shared.UnsupportedActionException;
 
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Startup;
@@ -44,7 +45,8 @@ public class SeamDispatch implements Dispatch {
             Maps.newHashMap();
 
     @SuppressWarnings("rawtypes")
-    public SeamDispatch() {
+    @Create
+    public void postConstruct() {
         // register all handlers with the @ActionHandlerFor annotation
         Set<Class<?>> annotatedClasses =
                 StandardDeploymentStrategy.instance().getAnnotatedClasses()

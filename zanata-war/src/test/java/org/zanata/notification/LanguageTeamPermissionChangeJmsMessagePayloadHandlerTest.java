@@ -33,10 +33,11 @@ public class LanguageTeamPermissionChangeJmsMessagePayloadHandlerTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+        Messages msgs = new Messages();
+        msgs.postConstruct();
         handler =
                 new LanguageTeamPermissionChangeJmsMessagePayloadHandler(
-                        emailBuilder, new Messages(), applicationConfiguration);
-
+                        emailBuilder, msgs, applicationConfiguration);
     }
 
     @Test
@@ -83,7 +84,9 @@ public class LanguageTeamPermissionChangeJmsMessagePayloadHandlerTest {
                 "John Smith <john@a.c>");
         LanguageTeamPermissionChangeEmailStrategy strategy =
                 strategyArgumentCaptor.getValue();
-        assertThat(strategy.getSubject(new Messages())).isEqualTo(
+        Messages msgs = new Messages();
+        msgs.postConstruct();
+        assertThat(strategy.getSubject(msgs)).isEqualTo(
                 "Your permissions in language team \"de\" have changed");
 
     }
