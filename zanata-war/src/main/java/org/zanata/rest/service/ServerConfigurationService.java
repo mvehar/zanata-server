@@ -21,10 +21,12 @@ import javax.xml.ws.Service;
 
 import org.jboss.resteasy.annotations.providers.jaxb.Wrapped;
 import org.jboss.resteasy.util.GenericType;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Transactional;
-import org.jboss.seam.annotations.security.Restrict;
+import org.zanata.security.annotations.CheckLoggedIn;
+import org.zanata.security.annotations.CheckPermission;
+import org.zanata.security.annotations.CheckRole;
 import org.zanata.common.Namespaces;
 import org.zanata.dao.ApplicationConfigurationDAO;
 import org.zanata.events.ConfigurationChanged;
@@ -37,7 +39,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.zanata.util.Event;
+import javax.enterprise.event.Event;
 import org.zanata.util.ServiceLocator;
 
 /**
@@ -46,12 +48,12 @@ import org.zanata.util.ServiceLocator;
  * @author Patrick Huang <a
  *         href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
-@Name("serverConfigurationResource")
+@Named("serverConfigurationResource")
 @Path("/configurations")
 @Produces({"application/xml", "application/json"})
 @Consumes({"application/xml", "application/json"})
 @Transactional
-@Restrict("#{s:hasRole('admin')}")
+@CheckRole("admin")
 @Slf4j
 @Beta
 public class ServerConfigurationService {
@@ -63,7 +65,7 @@ public class ServerConfigurationService {
     @DefaultValue(MediaType.APPLICATION_JSON)
     @Context
     private MediaType accept;
-    @In
+    @Inject
     private ApplicationConfigurationDAO applicationConfigurationDAO;
 
     /**

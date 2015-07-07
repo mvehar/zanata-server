@@ -23,8 +23,8 @@ package org.zanata.rest.editor.service;
 import com.google.common.base.Joiner;
 import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Option;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Transactional;
 import org.zanata.common.LocaleId;
 import org.zanata.model.HLocale;
@@ -47,17 +47,17 @@ import static org.zanata.webtrans.shared.rpc.HasSearchType.*;
 /**
  * @see org.zanata.rest.editor.service.resource.SuggestionsResource
  */
-@Name("editor.suggestionsService")
+@Named("editor.suggestionsService")
 @Path(SuggestionsResource.SERVICE_PATH)
 @Transactional
 public class SuggestionsService implements SuggestionsResource {
 
     public static final String SEARCH_TYPES = Joiner.on(", ").join(SearchType.values());
 
-    @In("translationMemoryServiceImpl")
+    @Inject
     private TranslationMemoryService transMemoryService;
 
-    @In("localeServiceImpl")
+    @Inject
     private LocaleService localeService;
 
     @Override

@@ -24,12 +24,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.AutoCreate;
-import org.jboss.seam.annotations.Create;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Synchronized;
 import org.zanata.ServerConstants;
 import org.zanata.dao.ApplicationConfigurationDAO;
@@ -42,9 +39,9 @@ import org.zanata.util.ServiceLocator;
  * @author Carlos Munoz <a
  *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@Name("databaseBackedConfig")
-@Scope(ScopeType.APPLICATION)
-@AutoCreate
+@Named("databaseBackedConfig")
+@javax.enterprise.context.ApplicationScoped
+
 @Synchronized(timeout = ServerConstants.DEFAULT_TIMEOUT)
 public class DatabaseBackedConfig implements Serializable {
 
@@ -52,14 +49,14 @@ public class DatabaseBackedConfig implements Serializable {
 
     private Map<String, String> configurationValues;
 
-    @In
+    @Inject
     private ServiceLocator serviceLocator;
 
     /**
      * Resets the store by clearing out all values. This means that values will
      * need to be reloaded as they are requested.
      */
-    @Create
+    @PostConstruct
     public void reset() {
         configurationValues = new HashMap<String, String>();
     }

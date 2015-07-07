@@ -20,10 +20,9 @@
  */
 package org.zanata.security;
 
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.Install;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import org.apache.deltaspike.core.api.exclude.Exclude;
+import org.apache.deltaspike.core.api.projectstage.ProjectStage;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Startup;
 import org.jboss.seam.annotations.intercept.BypassInterceptors;
 import org.jboss.seam.international.StatusMessage;
@@ -37,12 +36,12 @@ import static org.jboss.seam.annotations.Install.APPLICATION;
  * @author Carlos Munoz <a
  *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@Name("org.jboss.seam.security.facesSecurityEvents")
-@Scope(ScopeType.APPLICATION)
+@Named("org.jboss.seam.security.facesSecurityEvents")
+@javax.enterprise.context.ApplicationScoped
 @Install(precedence = APPLICATION,
         classDependencies = "javax.faces.context.FacesContext")
 @BypassInterceptors
-@Startup
+/* TODO [CDI] Remove @PostConstruct from startup method and make it accept (@Observes @Initialized ServletContext context) */
 public class FacesSecurityEvents extends
         org.jboss.seam.security.FacesSecurityEvents {
     @Override

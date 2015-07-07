@@ -57,17 +57,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.jboss.seam.Component;
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Observer;
-import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.contexts.ServletLifecycle;
 import org.jboss.seam.mail.MailSession;
 import org.zanata.events.ServerStarted;
 import org.zanata.exception.ZanataInitializationException;
 import org.zanata.rest.dto.VersionInfo;
-import org.zanata.util.Event;
+import javax.enterprise.event.Event;
 import org.zanata.util.VersionUtility;
 
 /**
@@ -79,8 +77,8 @@ import org.zanata.util.VersionUtility;
  * @author Christian Bauer
  * @author Sean Flanigan <a href="mailto:sflaniga@redhat.com">sflaniga@redhat.com</a>
  */
-@Name("zanataInit")
-@Scope(ScopeType.STATELESS)
+@Named("zanataInit")
+@javax.enterprise.context.Dependent
 @Slf4j
 public class ZanataInit {
     private static final DefaultArtifactVersion MIN_EAP_VERSION =
@@ -101,10 +99,10 @@ public class ZanataInit {
                 Level.SEVERE);
     }
 
-    @In
+    @Inject
     private ApplicationConfiguration applicationConfiguration;
 
-    @In("event")
+    @Inject
     private Event<ServerStarted> startupEvent;
 
     @Observer("org.jboss.seam.postInitialization")

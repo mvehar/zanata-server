@@ -8,12 +8,10 @@ import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Begin;
 import org.jboss.seam.annotations.End;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.security.AuthorizationException;
 import org.jboss.seam.security.NotLoggedInException;
 import org.jboss.seam.security.RunAsOperation;
@@ -23,22 +21,22 @@ import org.zanata.i18n.Messages;
 import org.zanata.model.HAccountResetPasswordKey;
 import org.zanata.ui.faces.FacesMessages;
 
-@Name("passwordReset")
-@Scope(ScopeType.CONVERSATION)
+@Named("passwordReset")
+@org.apache.deltaspike.core.api.scope.ViewAccessScoped /* TODO [CDI] check this: migrated from ScopeType.CONVERSATION */
 public class PasswordResetAction implements Serializable {
 
     private static final long serialVersionUID = -3966625589007754411L;
 
-    @In
+    @Inject
     private EntityManager entityManager;
 
-    @In
+    @Inject
     private IdentityManager identityManager;
 
-    @In("jsfMessages")
+    @Inject
     private FacesMessages facesMessages;
 
-    @In
+    @Inject
     private Messages msgs;
 
     @Getter

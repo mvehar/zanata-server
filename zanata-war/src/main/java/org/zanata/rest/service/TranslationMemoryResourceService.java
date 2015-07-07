@@ -32,11 +32,13 @@ import javax.ws.rs.core.StreamingOutput;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.annotations.TransactionPropagationType;
 import org.jboss.seam.annotations.Transactional;
-import org.jboss.seam.annotations.security.Restrict;
+import org.zanata.security.annotations.CheckLoggedIn;
+import org.zanata.security.annotations.CheckPermission;
+import org.zanata.security.annotations.CheckRole;
 import org.zanata.async.Async;
 import org.zanata.async.AsyncTaskHandle;
 import org.zanata.async.AsyncTaskResult;
@@ -62,7 +64,7 @@ import org.zanata.util.CloseableIterator;
 
 import com.google.common.base.Optional;
 
-@Name("translationMemoryResource")
+@Named("translationMemoryResource")
 @Path(TranslationMemoryResource.SERVICE_PATH)
 @Transactional(TransactionPropagationType.SUPPORTS)
 @Slf4j
@@ -72,25 +74,25 @@ import com.google.common.base.Optional;
 public class TranslationMemoryResourceService implements
         TranslationMemoryResource {
 
-    @In
+    @Inject
     private LocaleService localeServiceImpl;
-    @In
+    @Inject
     private LockManagerService lockManagerServiceImpl;
-    @In
+    @Inject
     private RestSlugValidator restSlugValidator;
-    @In
+    @Inject
     private TextFlowStreamingDAO textFlowStreamDAO;
-    @In
+    @Inject
     private TransMemoryStreamingDAO transMemoryStreamingDAO;
-    @In
+    @Inject
     private TransMemoryDAO transMemoryDAO;
-    @In
+    @Inject
     private TMXParser tmxParser;
-    @In
+    @Inject
     private ZanataIdentity identity;
 
     @Override
-    @Restrict("#{s:hasRole('admin')}")
+    @CheckRole("admin")
     public Response getAllTranslationMemory(@Nullable LocaleId locale) {
         log.debug("exporting TMX for all projects, locale {}", locale);
         if (locale != null) {
@@ -145,7 +147,7 @@ public class TranslationMemoryResourceService implements
     }
 
     @Override
-    @Restrict("#{s:hasRole('admin')}")
+    @CheckRole("admin")
     public Response getTranslationMemory(@Nonnull String slug) {
         log.debug("exporting TMX for translation memory {}", slug);
         TransMemory tm = getTM(transMemoryDAO.getBySlug(slug), slug);
@@ -156,7 +158,7 @@ public class TranslationMemoryResourceService implements
     }
 
     @Override
-    @Restrict("#{s:hasRole('admin')}")
+    @CheckRole("admin")
     public Response updateTranslationMemory(String slug, InputStream input)
             throws Exception {
         Lock tmLock = lockTM(slug);
@@ -177,7 +179,7 @@ public class TranslationMemoryResourceService implements
         return tm.get();
     }
 
-    @Restrict("#{s:hasRole('admin')}")
+    @CheckRole("admin")
     public Object deleteTranslationMemory(String slug)
             throws EntityMissingException {
         Lock tmLock = lockTM(slug);
@@ -195,7 +197,7 @@ public class TranslationMemoryResourceService implements
     }
 
     @Override
-    @Restrict("#{s:hasRole('admin')}")
+    @CheckRole("admin")
     public Object deleteTranslationUnits(String slug) {
         return deleteTranslationUnitsUnguarded(slug);
     }

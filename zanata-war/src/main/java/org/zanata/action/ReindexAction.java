@@ -8,12 +8,11 @@ import java.util.concurrent.ExecutionException;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.AutoCreate;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.security.Restrict;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.zanata.security.annotations.CheckLoggedIn;
+import org.zanata.security.annotations.CheckPermission;
+import org.zanata.security.annotations.CheckRole;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
@@ -22,17 +21,17 @@ import org.zanata.service.SearchIndexManager;
 
 import com.google.common.base.Optional;
 
-@AutoCreate
-@Name("reindexAction")
+
+@Named("reindexAction")
 @Slf4j
-@Scope(ScopeType.STATELESS)
-@Restrict("#{s:hasRole('admin')}")
+@javax.enterprise.context.Dependent
+@CheckRole("admin")
 public class ReindexAction implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final DecimalFormat PERCENT_FORMAT = new DecimalFormat("###.##");
 
-    @In
+    @Inject
     private SearchIndexManager searchIndexManager;
 
     public List<ReindexClassOptions> getClasses() {

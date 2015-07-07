@@ -21,7 +21,6 @@
 package org.zanata.security;
 
 import com.google.common.base.Optional;
-import org.jboss.seam.ScopeType;
 import org.jboss.seam.security.management.JpaIdentityStore;
 import org.zanata.dao.PersonDAO;
 import org.zanata.model.HAccount;

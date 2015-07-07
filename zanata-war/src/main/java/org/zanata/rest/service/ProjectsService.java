@@ -38,8 +38,8 @@ import javax.ws.rs.core.Response;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.jboss.resteasy.util.GenericType;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Transactional;
 import org.zanata.model.HProject;
 import org.zanata.rest.MediaTypes;
@@ -48,12 +48,12 @@ import org.zanata.rest.dto.Project;
 
 import com.google.common.base.Objects;
 
-@Name("projectsService")
+@Named("projectsService")
 @Path(ProjectsResource.SERVICE_PATH)
 @Transactional
 public class ProjectsService implements ProjectsResource {
 
-    @In
+    @Inject
     private Session session;
 
     /** Type of media requested. */

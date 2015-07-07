@@ -47,8 +47,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.NaturalIdentifier;
 import org.hibernate.criterion.Restrictions;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.faces.FacesManager;
 import org.jboss.seam.faces.Redirect;
@@ -90,7 +90,7 @@ import com.google.common.collect.Maps;
 
 import static javax.faces.application.FacesMessage.SEVERITY_ERROR;
 
-@Name("projectHome")
+@Named("projectHome")
 @Slf4j
 public class ProjectHome extends SlugHome<HProject> implements
     HasLanguageSettings {
@@ -114,46 +114,46 @@ public class ProjectHome extends SlugHome<HProject> implements
     @Getter
     private Long projectId;
 
-    @In
+    @Inject
     private ZanataIdentity identity;
 
-    @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER)
+    @Inject /* TODO [CDI] check this: migrated from @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER) */
     private HAccount authenticatedAccount;
 
-    @In
+    @Inject
     private LocaleService localeServiceImpl;
 
-    @In
+    @Inject
     private LocaleDAO localeDAO;
 
-    @In
+    @Inject
     private SlugEntityService slugEntityServiceImpl;
 
-    @In("commonMarkRenderer")
+    @Inject
     private CommonMarkRenderer renderer;
 
-    @In
+    @Inject
     private EntityManager entityManager;
 
-    @In("jsfMessages")
+    @Inject
     private FacesMessages facesMessages;
 
-    @In
+    @Inject
     private Messages msgs;
 
-    @In
+    @Inject
     private AccountRoleDAO accountRoleDAO;
 
-    @In
+    @Inject
     private WebHookDAO webHookDAO;
 
-    @In
+    @Inject
     private ValidationService validationServiceImpl;
 
-    @In
+    @Inject
     private CopyTransOptionsModel copyTransOptionsModel;
 
-    @In
+    @Inject
     private UrlUtil urlUtil;
 
     // This property is present to keep the filter in place when the region with
@@ -805,7 +805,7 @@ public class ProjectHome extends SlugHome<HProject> implements
         return list;
     }
 
-    @In
+    @Inject
     private Redirect redirect;
 
     public String removeMaintainer(HPerson person) {

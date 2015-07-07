@@ -26,8 +26,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Transactional;
 import org.zanata.dao.TextFlowDAO;
 import org.zanata.model.HLocale;
@@ -41,17 +41,17 @@ import org.zanata.service.LocaleService;
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-@Name("editor.transUnitService")
+@Named("editor.transUnitService")
 @Path(TransUnitResource.SERVICE_PATH)
 @Transactional
 public class TransUnitService implements TransUnitResource {
-    @In
+    @Inject
     private LocaleService localeServiceImpl;
 
-    @In
+    @Inject
     private TextFlowDAO textFlowDAO;
 
-    @In
+    @Inject
     private TransUnitUtils transUnitUtils;
 
     @Override

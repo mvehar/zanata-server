@@ -24,11 +24,11 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.security.Restrict;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.zanata.security.annotations.CheckLoggedIn;
+import org.zanata.security.annotations.CheckPermission;
+import org.zanata.security.annotations.CheckRole;
 import org.jboss.seam.security.management.JpaIdentityStore;
 import org.zanata.model.Activity;
 import org.zanata.model.HAccount;
@@ -37,16 +37,16 @@ import org.zanata.service.ActivityService;
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-@Name("activityAction")
-@Scope(ScopeType.PAGE)
-@Restrict("#{identity.loggedIn}")
+@Named("activityAction")
+@javax.faces.bean.ViewScoped
+@CheckLoggedIn
 public class ActivityAction implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @In
+    @Inject
     private ActivityService activityServiceImpl;
 
-    @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER)
+    @Inject /* TODO [CDI] check this: migrated from @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER) */
     private HAccount authenticatedAccount;
 
     private final int ACTIVITY_COUNT_PER_LOAD = 5;

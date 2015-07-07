@@ -30,11 +30,11 @@ import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import lombok.NonNull;
 import org.apache.commons.lang.StringUtils;
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.security.Restrict;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.zanata.security.annotations.CheckLoggedIn;
+import org.zanata.security.annotations.CheckPermission;
+import org.zanata.security.annotations.CheckRole;
 import org.jboss.seam.security.management.JpaIdentityStore;
 import org.zanata.common.EntityStatus;
 import org.zanata.dao.AccountDAO;
@@ -57,34 +57,34 @@ import javax.annotation.Nullable;
 
 import lombok.Getter;
 
-@Name("dashboardAction")
-@Scope(ScopeType.PAGE)
-@Restrict("#{identity.loggedIn}")
+@Named("dashboardAction")
+@javax.faces.bean.ViewScoped
+@CheckLoggedIn
 public class DashboardAction implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @In
+    @Inject
     private GravatarService gravatarServiceImpl;
 
-    @In
+    @Inject
     private ActivityService activityServiceImpl;
 
-    @In
+    @Inject
     private LanguageTeamService languageTeamServiceImpl;
 
-    @In
+    @Inject
     private AccountDAO accountDAO;
 
-    @In
+    @Inject
     private ProjectDAO projectDAO;
 
-    @In
+    @Inject
     private ZanataIdentity identity;
 
-    @In
+    @Inject
     private Messages msgs;
 
-    @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER)
+    @Inject /* TODO [CDI] check this: migrated from @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER) */
     private HAccount authenticatedAccount;
 
     @Getter

@@ -31,12 +31,11 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang.StringUtils;
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.AutoCreate;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.security.Restrict;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.zanata.security.annotations.CheckLoggedIn;
+import org.zanata.security.annotations.CheckPermission;
+import org.zanata.security.annotations.CheckRole;
 import org.jboss.seam.international.LocaleSelector;
 import org.jboss.seam.security.management.JpaIdentityStore;
 import org.zanata.common.EntityStatus;
@@ -59,27 +58,27 @@ import org.zanata.webtrans.shared.model.ProjectIterationId;
 
 import com.google.common.collect.Lists;
 
-@AutoCreate
-@Name("versionGroupJoinAction")
-@Scope(ScopeType.PAGE)
+
+@Named("versionGroupJoinAction")
+@javax.faces.bean.ViewScoped
 @Slf4j
 public class VersionGroupJoinAction extends AbstractAutocomplete<HProject>
         implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @In
+    @Inject
     private VersionGroupService versionGroupServiceImpl;
 
-    @In
+    @Inject
     private ProjectDAO projectDAO;
 
-    @In
+    @Inject
     private ProjectIterationDAO projectIterationDAO;
 
-    @In
+    @Inject
     private VersionGroupDAO versionGroupDAO;
 
-    @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER)
+    @Inject /* TODO [CDI] check this: migrated from @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER) */
     private HAccount authenticatedAccount;
 
     @Getter
@@ -92,14 +91,14 @@ public class VersionGroupJoinAction extends AbstractAutocomplete<HProject>
     @Getter
     private List<SelectableVersion> projectVersions = Lists.newArrayList();
 
-    @In
+    @Inject
     private EmailService emailServiceImpl;
 
     @Getter
     @Setter
     private String message;
 
-    @In("jsfMessages")
+    @Inject
     private FacesMessages facesMessages;
 
     public boolean hasSelectedVersion() {
@@ -155,7 +154,7 @@ public class VersionGroupJoinAction extends AbstractAutocomplete<HProject>
         return maintainers;
     }
 
-    @Restrict("#{identity.loggedIn}")
+    @CheckLoggedIn
     public void send() {
         if (hasSelectedVersion()) {
             String fromName = authenticatedAccount.getPerson().getName();

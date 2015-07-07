@@ -22,11 +22,8 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.AutoCreate;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.zanata.common.EntityStatus;
 import org.zanata.hibernate.search.CaseInsensitiveWhitespaceAnalyzer;
 import org.zanata.hibernate.search.IndexFieldLabels;
@@ -35,11 +32,11 @@ import org.zanata.model.HPerson;
 import org.zanata.model.HProject;
 import org.zanata.model.HProjectIteration;
 
-@Name("projectDAO")
-@AutoCreate
-@Scope(ScopeType.STATELESS)
+@Named("projectDAO")
+
+@javax.enterprise.context.Dependent
 public class ProjectDAO extends AbstractDAOImpl<HProject, Long> {
-    @In
+    @Inject
     private FullTextEntityManager entityManager;
 
     public ProjectDAO() {

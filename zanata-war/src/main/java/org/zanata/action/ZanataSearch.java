@@ -12,11 +12,8 @@ import lombok.NoArgsConstructor;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.queryParser.ParseException;
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.AutoCreate;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.zanata.dao.AccountDAO;
 import org.zanata.dao.ProjectDAO;
 import org.zanata.model.HAccount;
@@ -32,19 +29,19 @@ import org.zanata.util.ServiceLocator;
 /**
  * This will search both projects and people.
  */
-@Name("zanataSearch")
-@Scope(ScopeType.CONVERSATION)
-@AutoCreate
+@Named("zanataSearch")
+@org.apache.deltaspike.core.api.scope.ViewAccessScoped /* TODO [CDI] check this: migrated from ScopeType.CONVERSATION */
+
 public class ZanataSearch implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private final boolean includeObsolete = false;
 
-    @In
+    @Inject
     private ProjectDAO projectDAO;
 
-    @In
+    @Inject
     private AccountDAO accountDAO;
 
     @Getter

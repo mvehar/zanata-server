@@ -25,12 +25,11 @@ import java.io.Serializable;
 
 import javax.faces.application.FacesMessage;
 
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.AutoCreate;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.security.Restrict;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.zanata.security.annotations.CheckLoggedIn;
+import org.zanata.security.annotations.CheckPermission;
+import org.zanata.security.annotations.CheckRole;
 import org.jboss.seam.security.management.JpaIdentityStore;
 import org.zanata.common.LocaleId;
 import org.zanata.email.ContactLanguageCoordinatorEmailStrategy;
@@ -49,25 +48,25 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-@AutoCreate
-@Name("languageContactCoordinatorAction")
-@Scope(ScopeType.PAGE)
+
+@Named("languageContactCoordinatorAction")
+@javax.faces.bean.ViewScoped
 @Slf4j
 public class LanguageContactCoordinatorAction implements Serializable {
 
-    @In(value = JpaIdentityStore.AUTHENTICATED_USER, required = false)
+    @Inject /* TODO [CDI] check this: migrated from @In(value = JpaIdentityStore.AUTHENTICATED_USER, required = false) */
     private HAccount authenticatedAccount;
 
-    @In("jsfMessages")
+    @Inject
     private FacesMessages facesMessages;
 
-    @In
+    @Inject
     private EmailService emailServiceImpl;
 
-    @In
+    @Inject
     private LocaleService localeServiceImpl;
 
-    @In
+    @Inject
     private Messages msgs;
 
     @Getter
@@ -80,7 +79,7 @@ public class LanguageContactCoordinatorAction implements Serializable {
 
     private HLocale locale;
 
-    @Restrict("#{identity.loggedIn}")
+    @CheckLoggedIn
     public void send() {
         String fromName = authenticatedAccount.getPerson().getName();
         String fromLoginName = authenticatedAccount.getUsername();

@@ -25,11 +25,9 @@ import java.util.Set;
 import java.util.concurrent.Future;
 
 import com.google.common.collect.Lists;
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Observer;
-import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.core.Events;
 import org.jboss.seam.security.management.JpaIdentityStore;
@@ -66,7 +64,7 @@ import org.zanata.util.StatisticsUtil;
 
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
-import org.zanata.util.Event;
+import javax.enterprise.event.Event;
 
 import javax.enterprise.event.Observes;
 
@@ -77,49 +75,49 @@ import javax.enterprise.event.Observes;
  * @author Carlos Munoz <a
  *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@Name("documentServiceImpl")
-@Scope(ScopeType.STATELESS)
+@Named("documentServiceImpl")
+@javax.enterprise.context.Dependent
 @ContainsAsyncMethods
 @Slf4j
 public class DocumentServiceImpl implements DocumentService {
-    @In(required = false)
+    @Inject /* TODO [CDI] check this: migrated from @In(required = false) */
     private ZanataIdentity identity;
 
-    @In
+    @Inject
     private ProjectIterationDAO projectIterationDAO;
 
-    @In
+    @Inject
     private DocumentDAO documentDAO;
 
-    @In
+    @Inject
     private LocaleService localeServiceImpl;
 
-    @In
+    @Inject
     private CopyTransService copyTransServiceImpl;
 
-    @In
+    @Inject
     private LockManagerService lockManagerServiceImpl;
 
-    @In
+    @Inject
     private VersionStateCache versionStateCacheImpl;
 
-    @In
+    @Inject
     private TranslationStateCache translationStateCacheImpl;
 
-    @In
+    @Inject
     private ResourceUtils resourceUtils;
 
-    @In
+    @Inject
     private ApplicationConfiguration applicationConfiguration;
 
-    @In(value = JpaIdentityStore.AUTHENTICATED_USER, scope = ScopeType.SESSION,
+    @Inject(value = JpaIdentityStore.AUTHENTICATED_USER, scope = ScopeType.SESSION,
             required = false)
     private HAccount authenticatedAccount;
 
-    @In
+    @Inject
     private Messages msgs;
 
-    @In("event")
+    @Inject
     private Event<DocumentUploadedEvent> documentUploadedEvent;
 
     @Override

@@ -25,10 +25,10 @@ import javax.annotation.Nullable;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import org.jboss.seam.annotations.Install;
-import org.jboss.seam.annotations.Name;
+import org.apache.deltaspike.core.api.exclude.Exclude;
+import org.apache.deltaspike.core.api.projectstage.ProjectStage;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Observer;
-import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Startup;
 import org.jboss.seam.annotations.intercept.BypassInterceptors;
 import org.jboss.seam.contexts.Contexts;
@@ -50,11 +50,11 @@ import org.zanata.util.ServiceLocator;
 import static org.jboss.seam.ScopeType.SESSION;
 import static org.jboss.seam.annotations.Install.APPLICATION;
 
-@Name("org.jboss.seam.security.identity")
-@Scope(SESSION)
+@Named("org.jboss.seam.security.identity")
+@javax.enterprise.context.SessionScoped
 @Install(precedence = APPLICATION)
 @BypassInterceptors
-@Startup
+/* TODO [CDI] Remove @PostConstruct from startup method and make it accept (@Observes @Initialized ServletContext context) */
 public class ZanataIdentity extends Identity {
     private static final Logger log = LoggerFactory.getLogger(
             ZanataIdentity.class);

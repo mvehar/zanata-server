@@ -23,12 +23,12 @@ package org.zanata.action;
 
 import java.io.Serializable;
 
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.Create;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.security.Restrict;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.zanata.security.annotations.CheckLoggedIn;
+import org.zanata.security.annotations.CheckPermission;
+import org.zanata.security.annotations.CheckRole;
 import org.jboss.seam.security.management.JpaIdentityStore;
 import org.zanata.email.ContactAdminAnonymousEmailStrategy;
 import org.zanata.email.ContactAdminEmailStrategy;
@@ -51,21 +51,21 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-@Name("contactAdminAction")
-@Scope(ScopeType.PAGE)
+@Named("contactAdminAction")
+@javax.faces.bean.ViewScoped
 @Slf4j
 public class ContactAdminAction implements Serializable {
 
-    @In(value = JpaIdentityStore.AUTHENTICATED_USER, required = false)
+    @Inject /* TODO [CDI] check this: migrated from @In(value = JpaIdentityStore.AUTHENTICATED_USER, required = false) */
     private HAccount authenticatedAccount;
 
-    @In
+    @Inject
     private EmailService emailServiceImpl;
 
-    @In
+    @Inject
     private Messages msgs;
 
-    @In("jsfMessages")
+    @Inject
     private FacesMessages facesMessages;
 
     @Getter
@@ -79,7 +79,7 @@ public class ContactAdminAction implements Serializable {
     /**
      * Send email to admin by registered user.
      */
-    @Restrict("#{identity.loggedIn}")
+    @CheckLoggedIn
     public void send() {
         String fromName = authenticatedAccount.getPerson().getName();
         String fromLoginName = authenticatedAccount.getUsername();

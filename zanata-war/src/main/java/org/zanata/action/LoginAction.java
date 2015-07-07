@@ -25,10 +25,8 @@ import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.security.Identity;
 import org.zanata.ApplicationConfiguration;
 import org.zanata.security.AuthenticationManager;
@@ -46,21 +44,21 @@ import org.zanata.security.openid.YahooOpenIdProvider;
  * @author Carlos Munoz <a
  *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@Name("loginAction")
-@Scope(ScopeType.PAGE)
+@Named("loginAction")
+@javax.faces.bean.ViewScoped
 public class LoginAction implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @In
+    @Inject
     private Identity identity;
 
-    @In
+    @Inject
     private ZanataCredentials credentials;
 
-    @In
+    @Inject
     private AuthenticationManager authenticationManager;
 
-    @In
+    @Inject
     private ApplicationConfiguration applicationConfiguration;
 
     @Getter

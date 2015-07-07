@@ -39,8 +39,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.NaturalIdentifier;
 import org.hibernate.criterion.Restrictions;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.faces.FacesManager;
 import org.zanata.common.DocumentType;
 import org.zanata.common.EntityStatus;
@@ -78,7 +78,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-@Name("versionHome")
+@Named("versionHome")
 @Slf4j
 public class VersionHome extends SlugHome<HProjectIteration> implements
     HasLanguageSettings {
@@ -104,40 +104,40 @@ public class VersionHome extends SlugHome<HProjectIteration> implements
     @Setter
     private String projectSlug;
 
-    @In("jsfMessages")
+    @Inject
     private FacesMessages facesMessages;
 
-    @In
+    @Inject
     private ProjectIterationDAO projectIterationDAO;
 
-    @In
+    @Inject
     private LocaleDAO localeDAO;
 
-    @In
+    @Inject
     private ConversationScopeMessages conversationScopeMessages;
 
-    @In
+    @Inject
     private LocaleService localeServiceImpl;
 
-    @In
+    @Inject
     private ValidationService validationServiceImpl;
 
-    @In
+    @Inject
     private SlugEntityService slugEntityServiceImpl;
 
-    @In(create = true)
+    @Inject
     private ProjectDAO projectDAO;
 
-    @In
+    @Inject
     private Messages msgs;
 
-    @In
+    @Inject
     private CopyVersionManager copyVersionManager;
 
-    @In
+    @Inject
     private UrlUtil urlUtil;
 
-    @In
+    @Inject
     private ZanataIdentity identity;
 
     private Map<ValidationId, ValidationAction> availableValidations = Maps

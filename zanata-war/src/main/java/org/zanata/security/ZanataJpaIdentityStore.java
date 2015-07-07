@@ -20,10 +20,10 @@
  */
 package org.zanata.security;
 
-import org.jboss.seam.annotations.Create;
-import org.jboss.seam.annotations.Install;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import javax.annotation.PostConstruct;
+import org.apache.deltaspike.core.api.exclude.Exclude;
+import org.apache.deltaspike.core.api.projectstage.ProjectStage;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Startup;
 import org.jboss.seam.annotations.intercept.BypassInterceptors;
 import org.jboss.seam.annotations.security.management.PasswordSalt;
@@ -40,10 +40,10 @@ import org.zanata.util.ServiceLocator;
 
 import static org.jboss.seam.ScopeType.APPLICATION;
 
-@Name("org.jboss.seam.security.identityStore")
+@Named("org.jboss.seam.security.identityStore")
 @Install(precedence = Install.DEPLOYMENT, value = true)
-@Scope(APPLICATION)
-@Startup
+@javax.enterprise.context.ApplicationScoped
+/* TODO [CDI] Remove @PostConstruct from startup method and make it accept (@Observes @Initialized ServletContext context) */
 @BypassInterceptors
 public class ZanataJpaIdentityStore extends JpaIdentityStore {
 
@@ -60,7 +60,7 @@ public class ZanataJpaIdentityStore extends JpaIdentityStore {
     private AnnotatedBeanProperty<PasswordSalt> passwordSaltProperty;
     private AnnotatedBeanProperty<UserPassword> userPasswordProperty;
 
-    @Create
+    @PostConstruct
     public void init() {
         super.init();
         initProperties();

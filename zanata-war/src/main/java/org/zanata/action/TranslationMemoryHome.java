@@ -24,10 +24,12 @@ import javax.faces.event.ValueChangeEvent;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Transactional;
-import org.jboss.seam.annotations.security.Restrict;
+import org.zanata.security.annotations.CheckLoggedIn;
+import org.zanata.security.annotations.CheckPermission;
+import org.zanata.security.annotations.CheckRole;
 import org.zanata.model.tm.TransMemory;
 import org.zanata.seam.framework.EntityHome;
 import org.zanata.service.SlugEntityService;
@@ -39,14 +41,14 @@ import org.zanata.ui.faces.FacesMessages;
  * @author Carlos Munoz <a
  *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@Name("translationMemoryHome")
-@Restrict("#{s:hasRole('admin')}")
+@Named("translationMemoryHome")
+@CheckRole("admin")
 @Slf4j
 public class TranslationMemoryHome extends EntityHome<TransMemory> {
-    @In
+    @Inject
     private SlugEntityService slugEntityServiceImpl;
 
-    @In("jsfMessages")
+    @Inject
     private FacesMessages facesMessages;
 
     public void verifySlugAvailable(ValueChangeEvent e) {

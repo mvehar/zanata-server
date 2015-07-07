@@ -29,12 +29,11 @@ import javax.persistence.PersistenceException;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.exception.ConstraintViolationException;
 import org.jboss.seam.Component;
-import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Begin;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Install;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import javax.inject.Inject;
+import org.apache.deltaspike.core.api.exclude.Exclude;
+import org.apache.deltaspike.core.api.projectstage.ProjectStage;
+import javax.inject.Named;
 import org.jboss.seam.security.management.IdentityManager;
 import org.zanata.ApplicationConfiguration;
 import org.zanata.dao.AccountDAO;
@@ -62,32 +61,32 @@ import static org.jboss.seam.annotations.Install.APPLICATION;
  * @author Carlos Munoz <a
  *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@Name("org.jboss.seam.security.management.userAction")
-@Scope(CONVERSATION)
+@Named("org.jboss.seam.security.management.userAction")
+@org.apache.deltaspike.core.api.scope.ViewAccessScoped /* TODO [CDI] check this: migrated from ScopeType.CONVERSATION */
 @Install(precedence = APPLICATION)
 public class UserAction extends
         org.jboss.seam.security.management.action.UserAction {
     private static final long serialVersionUID = 1L;
 
-    @In
+    @Inject
     private IdentityManager identityManager;
 
-    @In
+    @Inject
     private EntityManager entityManager;
 
-    @In("jsfMessages")
+    @Inject
     private FacesMessages facesMessages;
 
-    @In
+    @Inject
     private Messages msgs;
 
-    @In
+    @Inject
     private UserAccountService userAccountServiceImpl;
 
-    @In
+    @Inject
     private EmailService emailServiceImpl;
 
-    @In
+    @Inject
     private PersonDAO personDAO;
 
     private boolean newUserFlag;

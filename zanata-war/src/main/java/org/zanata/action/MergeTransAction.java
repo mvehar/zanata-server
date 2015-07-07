@@ -11,10 +11,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.commons.lang.StringUtils;
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.security.management.JpaIdentityStore;
@@ -39,8 +37,8 @@ import org.zanata.ui.CopyAction;
  *
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-@Name("mergeTransAction")
-@Scope(ScopeType.PAGE)
+@Named("mergeTransAction")
+@javax.faces.bean.ViewScoped
 public class MergeTransAction extends CopyAction implements Serializable {
 
     @Getter
@@ -61,25 +59,25 @@ public class MergeTransAction extends CopyAction implements Serializable {
     @Setter
     private boolean keepExistingTranslation;
 
-    @In
+    @Inject
     private ProjectDAO projectDAO;
 
-    @In
+    @Inject
     private ProjectIterationDAO projectIterationDAO;
 
-    @In
+    @Inject
     private MergeTranslationsManager mergeTranslationsManager;
 
-    @In
+    @Inject
     private CopyTransManager copyTransManager;
 
-    @In
+    @Inject
     private CopyVersionManager copyVersionManager;
 
-    @In
+    @Inject
     private Messages msgs;
 
-    @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER)
+    @Inject /* TODO [CDI] check this: migrated from @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER) */
     private HAccount authenticatedAccount;
 
     private HProjectIteration targetVersion;

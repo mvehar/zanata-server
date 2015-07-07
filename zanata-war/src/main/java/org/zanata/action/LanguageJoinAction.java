@@ -26,12 +26,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.AutoCreate;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.security.Restrict;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.zanata.security.annotations.CheckLoggedIn;
+import org.zanata.security.annotations.CheckPermission;
+import org.zanata.security.annotations.CheckRole;
 import org.jboss.seam.security.management.JpaIdentityStore;
 import org.zanata.common.LocaleId;
 import org.zanata.dao.LocaleMemberDAO;
@@ -49,26 +48,26 @@ import org.zanata.ui.faces.FacesMessages;
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
 
-@AutoCreate
-@Name("languageJoinAction")
-@Scope(ScopeType.PAGE)
+
+@Named("languageJoinAction")
+@javax.faces.bean.ViewScoped
 @Slf4j
 public class LanguageJoinAction implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @In
+    @Inject
     private LocaleMemberDAO localeMemberDAO;
 
-    @In
+    @Inject
     private LocaleService localeServiceImpl;
 
-    @In
+    @Inject
     private EmailService emailServiceImpl;
 
-    @In("jsfMessages")
+    @Inject
     private FacesMessages facesMessages;
 
-    @In
+    @Inject
     private Messages msgs;
 
     @Getter
@@ -93,7 +92,7 @@ public class LanguageJoinAction implements Serializable {
     @Setter
     private String message;
 
-    @In(value = JpaIdentityStore.AUTHENTICATED_USER, required = false)
+    @Inject /* TODO [CDI] check this: migrated from @In(value = JpaIdentityStore.AUTHENTICATED_USER, required = false) */
     private HAccount authenticatedAccount;
 
     public boolean hasSelectedRole() {
@@ -117,7 +116,7 @@ public class LanguageJoinAction implements Serializable {
         message = "";
     }
 
-    @Restrict("#{identity.loggedIn}")
+    @CheckLoggedIn
     public void send() {
         String fromName = authenticatedAccount.getPerson().getName();
         String fromLoginName = authenticatedAccount.getUsername();

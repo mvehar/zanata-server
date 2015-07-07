@@ -14,8 +14,8 @@ import javax.ws.rs.core.UriInfo;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Transactional;
 import org.zanata.common.LocaleId;
 import org.zanata.dao.GlossaryDAO;
@@ -28,7 +28,7 @@ import org.zanata.rest.dto.GlossaryTerm;
 import org.zanata.security.ZanataIdentity;
 import org.zanata.service.GlossaryFileService;
 
-@Name("glossaryService")
+@Named("glossaryService")
 @Path(GlossaryResource.SERVICE_PATH)
 @Slf4j
 @Transactional
@@ -46,13 +46,13 @@ public class GlossaryService implements GlossaryResource {
     @Context
     private Request request;
 
-    @In
+    @Inject
     private GlossaryDAO glossaryDAO;
 
-    @In
+    @Inject
     private GlossaryFileService glossaryFileServiceImpl;
 
-    @In
+    @Inject
     private ZanataIdentity identity;
 
     @Override

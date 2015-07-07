@@ -28,8 +28,8 @@ import javax.security.auth.login.LoginException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang.StringUtils;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.security.Identity;
 import org.zanata.dao.PersonDAO;
@@ -42,22 +42,22 @@ import org.zanata.ui.faces.FacesMessages;
 
 import static javax.faces.application.FacesMessage.SEVERITY_ERROR;
 
-@Name("validateEmail")
+@Named("validateEmail")
 @Slf4j
 public class ValidateEmailAction implements Serializable {
     private static final long serialVersionUID = 1L;
     private String activationKey;
 
-    @In
+    @Inject
     PersonDAO personDAO;
 
-    @In
+    @Inject
     Identity identity;
 
-    @In("jsfMessages")
+    @Inject
     private FacesMessages facesMessages;
 
-    @In
+    @Inject
     EmailChangeService emailChangeService;
 
     @Transactional

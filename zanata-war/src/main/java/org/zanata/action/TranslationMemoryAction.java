@@ -34,13 +34,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Out;
-import org.jboss.seam.annotations.Scope;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.enterprise.inject.Produces;
 import org.jboss.seam.annotations.Transactional;
-import org.jboss.seam.annotations.security.Restrict;
+import org.zanata.security.annotations.CheckLoggedIn;
+import org.zanata.security.annotations.CheckPermission;
+import org.zanata.security.annotations.CheckRole;
 import org.zanata.async.AsyncTaskHandle;
 import org.zanata.async.AsyncTaskHandleManager;
 import org.zanata.dao.TransMemoryDAO;
@@ -57,21 +57,21 @@ import com.google.common.collect.Lists;
  * @author Carlos Munoz <a
  *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@Name("translationMemoryAction")
-@Restrict("#{s:hasRole('admin')}")
-@Scope(ScopeType.PAGE)
+@Named("translationMemoryAction")
+@CheckRole("admin")
+@javax.faces.bean.ViewScoped
 @Slf4j
 public class TranslationMemoryAction implements Serializable {
-    @In("jsfMessages")
+    @Inject
     private FacesMessages facesMessages;
 
-    @In
+    @Inject
     private TransMemoryDAO transMemoryDAO;
 
-    @In
+    @Inject
     private TranslationMemoryResourceService translationMemoryResource;
 
-    @In
+    @Inject
     private AsyncTaskHandleManager asyncTaskHandleManager;
 
     private List<TransMemory> transMemoryList;
@@ -79,8 +79,8 @@ public class TranslationMemoryAction implements Serializable {
     /**
      * Stores the last process handle, in page scope (ie for this user).
      */
-    @In(scope = ScopeType.PAGE, required = false)
-    @Out(scope = ScopeType.PAGE, required = false)
+    @Inject /* TODO [CDI] check this: migrated from @In(scope = ScopeType.PAGE, required = false) */
+    @Produces /* FIXME [CDI] check this: migrated from @Out */(scope = ScopeType.PAGE, required = false)
     private Future lastTaskResult;
 
     @Getter

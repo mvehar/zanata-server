@@ -27,12 +27,12 @@ import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityNotFoundException;
 
 import org.apache.commons.lang.StringUtils;
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Transactional;
-import org.jboss.seam.annotations.security.Restrict;
+import org.zanata.security.annotations.CheckLoggedIn;
+import org.zanata.security.annotations.CheckPermission;
+import org.zanata.security.annotations.CheckRole;
 import org.jboss.seam.faces.Redirect;
 import org.jboss.seam.security.management.JpaIdentityStore;
 import org.zanata.common.LocaleId;
@@ -53,7 +53,7 @@ import org.zanata.security.ZanataIdentity;
 import org.zanata.service.LanguageTeamService;
 import org.zanata.service.LocaleService;
 import org.zanata.ui.faces.FacesMessages;
-import org.zanata.util.Event;
+import javax.enterprise.event.Event;
 import org.zanata.ui.AbstractListFilter;
 import org.zanata.ui.InMemoryListFilter;
 import org.zanata.util.ServiceLocator;
@@ -64,52 +64,52 @@ import lombok.extern.slf4j.Slf4j;
 
 import static javax.faces.application.FacesMessage.SEVERITY_ERROR;
 
-@Name("languageAction")
-@Scope(ScopeType.PAGE)
+@Named("languageAction")
+@javax.faces.bean.ViewScoped
 @Slf4j
 public class LanguageAction implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @In
+    @Inject
     private LanguageTeamService languageTeamServiceImpl;
 
-    @In
+    @Inject
     private LocaleDAO localeDAO;
 
-    @In
+    @Inject
     private PersonDAO personDAO;
 
-    @In
+    @Inject
     private LocaleService localeServiceImpl;
 
-    @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER)
+    @Inject /* TODO [CDI] check this: migrated from @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER) */
     private HAccount authenticatedAccount;
 
-    @In
+    @Inject
     private ZanataIdentity identity;
 
-    @In
+    @Inject
     private Messages msgs;
 
-    @In("jsfMessages")
+    @Inject
     private FacesMessages facesMessages;
 
-    @In("event")
+    @Inject
     private Event<JoinedLanguageTeam> joinLanguageTeamEvent;
 
-    @In("event")
+    @Inject
     private Event<LanguageTeamPermissionChangedEvent> languageTeamPermissionChangedEvent;
 
-    @In("event")
+    @Inject
     private Event<LeftLanguageTeam> leaveLanguageTeamEvent;
 
-    @In
+    @Inject
     private LocaleMemberDAO localeMemberDAO;
 
-    @In
+    @Inject
     private ResourceUtils resourceUtils;
 
-    @In
+    @Inject
     private Redirect redirect;
 
     @Getter
@@ -205,7 +205,7 @@ public class LanguageAction implements Serializable {
         isValidPluralForms((String) e.getNewValue(), e.getComponent().getId());
     }
 
-    @Restrict("#{s:hasRole('admin')}")
+    @CheckRole("admin")
     public void saveSettings() {
         HLocale hLocale = getLocale();
         if(!isValidPluralForms(hLocale.getPluralForms(), "pluralForms")) {
@@ -264,7 +264,7 @@ public class LanguageAction implements Serializable {
     }
 
     @Transactional
-    @Restrict("#{s:hasRole('admin')}")
+    @CheckRole("admin")
     public void joinLanguageTeam() {
         if (authenticatedAccount == null) {
             log.error("failed to load auth person");

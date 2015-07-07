@@ -16,10 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.hibernate.Session;
 import org.jboss.resteasy.spi.NoLogWebApplicationException;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Transactional;
-import org.jboss.seam.annotations.security.Restrict;
+import org.zanata.security.annotations.CheckLoggedIn;
+import org.zanata.security.annotations.CheckPermission;
+import org.zanata.security.annotations.CheckRole;
 import org.jboss.seam.security.Identity;
 import org.zanata.common.LocaleId;
 import org.zanata.dao.AccountDAO;
@@ -31,11 +33,11 @@ import org.zanata.model.HLocale;
 import org.zanata.model.HPerson;
 import org.zanata.rest.dto.Account;
 
-@Name("accountService")
+@Named("accountService")
 @Path(AccountResource.SERVICE_PATH)
 @Slf4j
 @Transactional
-@Restrict("#{s:hasRole('admin')}")
+@CheckRole("admin")
 public class AccountService implements AccountResource {
     /** User name that identifies an account. */
     @PathParam("username")
@@ -47,19 +49,19 @@ public class AccountService implements AccountResource {
     @Context
     private UriInfo uri;
 
-    @In
+    @Inject
     private AccountDAO accountDAO;
 
-    @In
+    @Inject
     private AccountRoleDAO accountRoleDAO;
 
-    @In
+    @Inject
     private LocaleDAO localeDAO;
 
-    @In
+    @Inject
     private Identity identity;
 
-    @In
+    @Inject
     private Session session;
 
     @Override

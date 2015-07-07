@@ -33,10 +33,8 @@ import javax.annotation.Nullable;
 import javax.faces.application.FacesMessage;
 
 import org.apache.commons.lang.StringUtils;
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.security.management.JpaIdentityStore;
 import org.zanata.async.handle.CopyVersionTaskHandle;
 import org.zanata.common.EntityStatus;
@@ -72,43 +70,43 @@ import lombok.Setter;
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-@Name("projectHomeAction")
-@Scope(ScopeType.PAGE)
+@Named("projectHomeAction")
+@javax.faces.bean.ViewScoped
 public class ProjectHomeAction extends AbstractSortAction implements
         Serializable {
 
-    @In
+    @Inject
     private ActivityService activityServiceImpl;
 
-    @In
+    @Inject
     private LocaleService localeServiceImpl;
 
-    @In
+    @Inject
     private VersionStateCache versionStateCacheImpl;
 
-    @In
+    @Inject
     private LocaleMemberDAO localeMemberDAO;
 
-    @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER)
+    @Inject /* TODO [CDI] check this: migrated from @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER) */
     private HAccount authenticatedAccount;
 
-    @In
+    @Inject
     private ZanataIdentity identity;
 
-    @In
+    @Inject
     private CopyVersionManager copyVersionManager;
 
-    @In
+    @Inject
     private Messages msgs;
 
     @Setter
     @Getter
     private String slug;
 
-    @In
+    @Inject
     private ProjectIterationDAO projectIterationDAO;
 
-    @In
+    @Inject
     private ConversationScopeMessages conversationScopeMessages;
 
     @Getter

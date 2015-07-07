@@ -33,8 +33,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.NaturalIdentifier;
 import org.hibernate.criterion.Restrictions;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.jboss.seam.security.management.JpaIdentityStore;
 import org.zanata.common.EntityStatus;
 import org.zanata.dao.ProjectIterationDAO;
@@ -68,7 +68,7 @@ import lombok.Setter;
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
 
-@Name("versionGroupHome")
+@Named("versionGroupHome")
 public class VersionGroupHome extends SlugHome<HIterationGroup> {
     private static final long serialVersionUID = 1L;
 
@@ -76,22 +76,22 @@ public class VersionGroupHome extends SlugHome<HIterationGroup> {
     @Setter
     private String slug;
 
-    @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER)
+    @Inject /* TODO [CDI] check this: migrated from @In(required = false, value = JpaIdentityStore.AUTHENTICATED_USER) */
     private HAccount authenticatedAccount;
 
-    @In("jsfMessages")
+    @Inject
     private FacesMessages facesMessages;
 
-    @In
+    @Inject
     private SlugEntityService slugEntityServiceImpl;
 
-    @In
+    @Inject
     private Messages msgs;
 
-    @In
+    @Inject
     private ConversationScopeMessages conversationScopeMessages;
 
-    @In
+    @Inject
     private ZanataIdentity identity;
 
     @Getter

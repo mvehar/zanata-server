@@ -22,16 +22,16 @@ package org.zanata.security;
 
 import javax.faces.context.FacesContext;
 
-import org.jboss.seam.annotations.Install;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import org.apache.deltaspike.core.api.exclude.Exclude;
+import org.apache.deltaspike.core.api.projectstage.ProjectStage;
+import javax.inject.Named;
 import org.jboss.seam.annotations.intercept.BypassInterceptors;
 import org.jboss.seam.security.RememberMe;
 
 import static org.jboss.seam.ScopeType.SESSION;
 
-@Name("org.jboss.seam.security.rememberMe")
-@Scope(SESSION)
+@Named("org.jboss.seam.security.rememberMe")
+@javax.enterprise.context.SessionScoped
 @Install(precedence = Install.DEPLOYMENT)
 @BypassInterceptors
 public class FixedRememberMe extends RememberMe {

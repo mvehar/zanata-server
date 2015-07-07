@@ -27,9 +27,9 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.jboss.seam.annotations.Install;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import org.apache.deltaspike.core.api.exclude.Exclude;
+import org.apache.deltaspike.core.api.projectstage.ProjectStage;
+import javax.inject.Named;
 import org.jboss.seam.annotations.Startup;
 import org.jboss.seam.annotations.intercept.BypassInterceptors;
 import org.jboss.seam.security.permission.PermissionResolver;
@@ -44,11 +44,11 @@ import org.zanata.util.ServiceLocator;
  * @author Carlos Munoz <a
  *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@Name("customPermissionResolver")
-@Scope(APPLICATION)
+@Named("customPermissionResolver")
+@javax.enterprise.context.ApplicationScoped
 @BypassInterceptors
 @Install(precedence = BUILT_IN)
-@Startup
+/* TODO [CDI] Remove @PostConstruct from startup method and make it accept (@Observes @Initialized ServletContext context) */
 public class CustomPermissionResolver implements PermissionResolver,
         Serializable {
 

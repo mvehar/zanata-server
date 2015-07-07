@@ -45,7 +45,7 @@
       status="versionTab-versionsLoader"/>
 
     <s:fragment
-      rendered="#{s:hasPermission(projectHome.instance, 'update')}">
+      rendered="#{identity.hasPermission(projectHome.instance, 'update')}">
       <div
         class="dropdown dropdown--header dropdown--small dropdown--right dropdown--inline js-dropdown"
         id="versions-more-actions">
@@ -89,7 +89,7 @@
     rendered="#{empty projectHomeAction.projectVersions}">
     <p class="txt--meta">#{msgs['jsf.NoVersions']}</p>
     <s:fragment
-      rendered="#{s:hasPermission(projectHome.instance, 'update')}">
+      rendered="#{identity.hasPermission(projectHome.instance, 'update')}">
       <p>
         <s:link styleClass="button--primary" propagation="none"
           value="#{msgs['jsf.project.NewVersion']}"
@@ -139,7 +139,7 @@
                 </a>
                 <ul class="dropdown__content js-dropdown__content">
                   <s:fragment
-                    rendered="#{s:hasPermission(projectHome.instance, 'update')}">
+                    rendered="#{identity.hasPermission(projectHome.instance, 'update')}">
                     <li>
                       <s:link view="/project/add_iteration.xhtml"
                         propagation="none" styleClass="i__item--right"
@@ -209,7 +209,7 @@
                     </h:outputFormat>
                   </s:span>
                   <s:fragment
-                    rendered="#{s:hasPermission(projectHome.instance, 'update') and projectHomeAction.isVersionCopying(version.project.slug, version.slug)}">
+                    rendered="#{identity.hasPermission(projectHome.instance, 'update') and projectHomeAction.isVersionCopying(version.project.slug, version.slug)}">
                     <button class="button--danger txt--mini l--push-left-half"
                       title="#{msgs['jsf.copyVersion.cancel.message']}"
                       onclick="onCancelCopyVersion('#{version.project.slug}', '#{version.slug}');return false;">
