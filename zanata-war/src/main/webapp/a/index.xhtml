@@ -6,6 +6,9 @@
   xmlns:h="http://java.sun.com/jsf/html"
   xmlns:f="http://java.sun.com/jsf/core"
   xmlns:ds="http://deltaspike.apache.org/jsf">
+  
+  <ui:param name="strictPermissions" value="true"></ui:param>
+  <ui:fragment rendered="#{!strictPermissions || identity.ccheckLoggedIn()}"/>
 
   <html class="no-js Ff(zsans) Lh(1.5) Bgc(#fff) Fz(16px)">
   <h:head>

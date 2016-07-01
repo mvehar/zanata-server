@@ -727,10 +727,17 @@ public class ProjectHome extends SlugHome<HProject> implements
     // @Begin(join = true) /* TODO [CDI] commented out begin conversation. Verify it still works properly */
     public void initialize() {
         validateSuppliedId();
+        
+        //TODO: Setup permissions config
+        HProject instance = getInstance();
+        identity.checkPermission(instance, "read");
+        
         if (getInstance().getDefaultCopyTransOpts() != null) {
             copyTransOptionsModel.setInstance(getInstance()
                     .getDefaultCopyTransOpts());
         }
+
+        
     }
 
     public void verifySlugAvailable(ValueChangeEvent e) {

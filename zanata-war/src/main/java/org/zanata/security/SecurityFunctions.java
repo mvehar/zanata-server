@@ -170,14 +170,20 @@ public class SecurityFunctions extends PermissionProvider {
 
     /* anyone can read a project */
     @GrantsPermission(actions = "read")
-    public static boolean canReadProject(HProject target) {
-        return true;
+    public boolean canReadProject(HProject target) {
+    	//return true;
+    	/* TODO: Make it configurable */
+        return isUserAllowedAccess(target);
+
     }
+    
 
     /* anyone can read a project iteration */
     @GrantsPermission(actions = "read")
-    public static boolean canReadProjectIteration(HProjectIteration target) {
-        return true;
+    public boolean canReadProjectIteration(HProjectIteration target) {
+        //return true;
+    	/* TODO: Make it configurable */
+        return isUserAllowedAccess(target.getProject());
     }
 
     /*
