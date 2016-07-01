@@ -50,6 +50,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,6 +88,9 @@ public class SearchService {
     private HAccount authenticatedAccount;
 
     private static final int MAX_RESULT = 20;
+    
+    //TODO: Chnage to configurable setting
+    private boolean strictPermissions = true;
 
     @GET
     @Path("/projects")
@@ -110,6 +115,19 @@ public class SearchService {
                                 validatePageSize(sizePerPage), offset,
                                 false);
             }
+            
+        	//TODO : Quickly fixed, should be refractored
+            if(strictPermissions){
+            	int original_size = projects.size();
+            	
+            	projects = projects.stream()
+            			.filter(f -> identity.hasPermission(f, "read"))
+            			.collect(Collectors.toList());
+            	
+            	totalCount = totalCount - (original_size - projects.size());
+            }
+            
+            
             List<SearchResult> results = projects.stream().map(p -> {
                 ProjectSearchResult result = new ProjectSearchResult();
                 result.setId(p.getSlug());
@@ -135,9 +153,20 @@ public class SearchService {
             @DefaultValue("1") @QueryParam("page") int page,
             @DefaultValue("20") @QueryParam("sizePerPage") int sizePerPage) {
 
+
+        //TODO: Restricted to admin role - should be configurable
+        if(strictPermissions && !identity.hasRole("admin")){
+        	        	
+            SearchResults searchResults = new SearchResults(0, new ArrayList<SearchResult>() ,
+                    SearchResult.SearchResultType.Group);
+            return Response.ok(searchResults).build();
+        	
+        }
+        
         int offset = (validatePage(page) - 1) * validatePageSize(sizePerPage);
         int totalCount;
         List<HIterationGroup> groups;
+
         boolean includeObsolete =
             identity.hasPermission("HIterationGroup", "view-obsolete");
 
@@ -179,6 +208,11 @@ public class SearchService {
         @DefaultValue("1") @QueryParam("page") int page,
         @DefaultValue("20") @QueryParam("sizePerPage") int sizePerPage) {
 
+        //TODO: Restricted to admin role - should be configurable
+        if(strictPermissions && !identity.hasRole("admin")){
+            return new SearchResults(0, new ArrayList<SearchResult>(),SearchResult.SearchResultType.Person);        	
+        }    	
+    	
         int offset = (validatePage(page) - 1) * validatePageSize(sizePerPage);
 
         int totalCount = personDAO.findAllContainingNameSize(query);
@@ -202,6 +236,11 @@ public class SearchService {
         @DefaultValue("1") @QueryParam("page") int page,
         @DefaultValue("20") @QueryParam("sizePerPage") int sizePerPage) {
 
+        //TODO: Restricted to admin role - should be configurable
+        if(strictPermissions && !identity.hasRole("admin")){
+            return new SearchResults(0, new ArrayList<SearchResult>(),SearchResult.SearchResultType.LanguageTeam);        	
+        }
+    	
         int offset = (validatePage(page) - 1) * validatePageSize(sizePerPage);
         int totalCount = localeDAO.countByNameLike(query);
         List<SearchResult> results = localeDAO
