@@ -8,7 +8,7 @@
   xmlns:ds="http://deltaspike.apache.org/jsf">
   
   <ui:param name="strictPermissions" value="true"></ui:param>
-  <ui:fragment rendered="#{!strictPermissions || identity.ccheckLoggedIn()}"/>
+  <ui:fragment rendered="#{!strictPermissions || identity.checkLoggedIn()}"/>
 
   <html class="no-js Ff(zsans) Lh(1.5) Bgc(#fff) Fz(16px)">
   <h:head>
