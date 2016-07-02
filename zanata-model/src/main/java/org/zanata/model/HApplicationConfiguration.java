@@ -68,6 +68,9 @@ public class HApplicationConfiguration extends ModelEntityBase {
     public static String KEY_MAX_CONCURRENT_REQ_PER_API_KEY = "max.concurrent.req.per.apikey";
     public static String KEY_MAX_ACTIVE_REQ_PER_API_KEY = "max.active.req.per.apikey";
     public static String KEY_MAX_FILES_PER_UPLOAD = "fileupload.max.files.per.upload";
+    
+    public static String KEY_STRICT_PERMISSIONS = "permissions.strict";
+
 
     private static final long serialVersionUID = 8652817113098817448L;
 

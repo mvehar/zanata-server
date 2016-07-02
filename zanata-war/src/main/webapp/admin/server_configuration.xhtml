@@ -137,6 +137,14 @@
           <h:selectBooleanCheckbox id="displayUserEmail" styleClass="l--push-h-quarter"
             value="#{serverConfigurationBean.displayUserEmail}"/>
         </div>
+        
+        <div class="form__item l--push-top-1">
+          <h3 class="heading--secondary l--push-all-0">#{msgs['jsf.config.strictPermissions.heading']}</h3>
+          <p>#{msgs['jsf.config.strictPermissions.description']}</p>
+          <h:outputLabel for="strictPermissions">#{msgs['jsf.config.strictPermissions.label']}</h:outputLabel>
+          <h:selectBooleanCheckbox id="strictPermissions" styleClass="l--push-h-quarter"
+            value="#{serverConfigurationBean.strictPermissions}"/>
+        </div>
 
         <div class="form__item l--push-top-1">
           <h3 class="heading--secondary l--push-all-0">#{msgs['jsf.config.Log']}</h3>

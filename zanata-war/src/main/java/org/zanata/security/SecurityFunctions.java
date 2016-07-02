@@ -22,6 +22,7 @@ package org.zanata.security;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
+import org.zanata.ApplicationConfiguration;
 import org.zanata.dao.PersonDAO;
 import org.zanata.dao.ProjectLocaleMemberDAO;
 import org.zanata.dao.ProjectMemberDAO;
@@ -71,6 +72,9 @@ public class SecurityFunctions extends PermissionProvider {
 
     @Inject
     private ZanataIdentity identity;
+    
+    @Inject
+    private ApplicationConfiguration applicationConfiguration;
 
     @Inject
     @Authenticated
@@ -171,19 +175,22 @@ public class SecurityFunctions extends PermissionProvider {
     /* anyone can read a project */
     @GrantsPermission(actions = "read")
     public boolean canReadProject(HProject target) {
-    	//return true;
-    	/* TODO: Make it configurable */
-        return isUserAllowedAccess(target);
-
+    	if(applicationConfiguration.isStrictPermissions()){
+            return isUserAllowedAccess(target);
+    	}
+    	
+    	return true;
     }
     
 
     /* anyone can read a project iteration */
     @GrantsPermission(actions = "read")
     public boolean canReadProjectIteration(HProjectIteration target) {
-        //return true;
-    	/* TODO: Make it configurable */
-        return isUserAllowedAccess(target.getProject());
+    	if(applicationConfiguration.isStrictPermissions()){
+            return isUserAllowedAccess(target.getProject());
+    	}
+    	
+    	return true;
     }
 
     /*

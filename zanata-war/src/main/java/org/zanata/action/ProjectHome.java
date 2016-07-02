@@ -56,6 +56,7 @@ import org.hibernate.criterion.Restrictions;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.deltaspike.jpa.api.transaction.Transactional;
+import org.zanata.ApplicationConfiguration;
 import org.zanata.common.EntityStatus;
 import org.zanata.common.LocaleId;
 import org.zanata.common.ProjectType;
@@ -117,6 +118,7 @@ public class ProjectHome extends SlugHome<HProject> implements
     @Any
     private ProjectSlug projectSlug;
 
+    
     /**
      * This field is set from form input which can differ from original slug
      */
@@ -174,6 +176,9 @@ public class ProjectHome extends SlugHome<HProject> implements
 
     @Inject
     private UrlUtil urlUtil;
+    
+    @Inject
+    private ApplicationConfiguration applicationConfiguration;
 
     // This property is present to keep the filter in place when the region with
     // the filter box is refreshed.
@@ -729,9 +734,12 @@ public class ProjectHome extends SlugHome<HProject> implements
         validateSuppliedId();
         
         //TODO: Setup permissions config
-        HProject instance = getInstance();
-        identity.checkPermission(instance, "read");
-        
+    	if(applicationConfiguration.isStrictPermissions()){
+            HProject instance = getInstance();
+            identity.checkPermission(instance, "read");
+    	}
+    	
+       
         if (getInstance().getDefaultCopyTransOpts() != null) {
             copyTransOptionsModel.setInstance(getInstance()
                     .getDefaultCopyTransOpts());

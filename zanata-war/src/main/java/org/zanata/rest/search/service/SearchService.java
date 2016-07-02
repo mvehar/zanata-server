@@ -24,6 +24,7 @@ package org.zanata.rest.search.service;
 import org.apache.commons.lang.StringUtils;
 import org.apache.deltaspike.jpa.api.transaction.Transactional;
 import org.apache.lucene.queryParser.ParseException;
+import org.zanata.ApplicationConfiguration;
 import org.zanata.common.EntityStatus;
 import org.zanata.dao.LocaleDAO;
 import org.zanata.dao.PersonDAO;
@@ -89,8 +90,8 @@ public class SearchService {
 
     private static final int MAX_RESULT = 20;
     
-    //TODO: Chnage to configurable setting
-    private boolean strictPermissions = true;
+    @Inject
+    private ApplicationConfiguration applicationConfiguration;
 
     @GET
     @Path("/projects")
@@ -117,7 +118,7 @@ public class SearchService {
             }
             
         	//TODO : Quickly fixed, should be refractored
-            if(strictPermissions){
+            if(applicationConfiguration.isStrictPermissions()){
             	int original_size = projects.size();
             	
             	projects = projects.stream()
@@ -154,8 +155,8 @@ public class SearchService {
             @DefaultValue("20") @QueryParam("sizePerPage") int sizePerPage) {
 
 
-        //TODO: Restricted to admin role - should be configurable
-        if(strictPermissions && !identity.hasRole("admin")){
+        if(applicationConfiguration.isStrictPermissions()
+        		&& !identity.hasRole("admin")){
         	        	
             SearchResults searchResults = new SearchResults(0, new ArrayList<SearchResult>() ,
                     SearchResult.SearchResultType.Group);
@@ -208,8 +209,8 @@ public class SearchService {
         @DefaultValue("1") @QueryParam("page") int page,
         @DefaultValue("20") @QueryParam("sizePerPage") int sizePerPage) {
 
-        //TODO: Restricted to admin role - should be configurable
-        if(strictPermissions && !identity.hasRole("admin")){
+        if(applicationConfiguration.isStrictPermissions()
+        		&& !identity.hasRole("admin")){
             return new SearchResults(0, new ArrayList<SearchResult>(),SearchResult.SearchResultType.Person);        	
         }    	
     	
@@ -236,8 +237,8 @@ public class SearchService {
         @DefaultValue("1") @QueryParam("page") int page,
         @DefaultValue("20") @QueryParam("sizePerPage") int sizePerPage) {
 
-        //TODO: Restricted to admin role - should be configurable
-        if(strictPermissions && !identity.hasRole("admin")){
+        if(applicationConfiguration.isStrictPermissions()
+        		&& !identity.hasRole("admin")){
             return new SearchResults(0, new ArrayList<SearchResult>(),SearchResult.SearchResultType.LanguageTeam);        	
         }
     	

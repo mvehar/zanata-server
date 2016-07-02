@@ -446,4 +446,8 @@ public class ApplicationConfiguration implements Serializable {
     public boolean isDisplayUserEmail() {
         return databaseBackedConfig.isDisplayUserEmail();
     }
+    
+    public boolean isStrictPermissions() {
+        return databaseBackedConfig.isStrictPermissions();
+    }
 }
