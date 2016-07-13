@@ -64,7 +64,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @RequestScoped
 @Path("/search")
 @Produces(APPLICATION_JSON)
-@Transactional
+@Transactional(readOnly = true)
 public class SearchService {
 
     @Inject
