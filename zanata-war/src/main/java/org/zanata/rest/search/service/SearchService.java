@@ -89,7 +89,7 @@ public class SearchService {
     private HAccount authenticatedAccount;
 
     private static final int MAX_RESULT = 20;
-    
+
     @Inject
     private ApplicationConfiguration applicationConfiguration;
 
@@ -116,19 +116,18 @@ public class SearchService {
                                 validatePageSize(sizePerPage), offset,
                                 false);
             }
-            
-        	//TODO : Quickly fixed, should be refractored
+
+            //TODO : Quickly fixed, should be refractored
             if(applicationConfiguration.isStrictPermissions()){
             	int original_size = projects.size();
-            	
+
             	projects = projects.stream()
             			.filter(f -> identity.hasPermission(f, "read"))
             			.collect(Collectors.toList());
             	
             	totalCount = totalCount - (original_size - projects.size());
             }
-            
-            
+
             List<SearchResult> results = projects.stream().map(p -> {
                 ProjectSearchResult result = new ProjectSearchResult();
                 result.setId(p.getSlug());
@@ -157,13 +156,12 @@ public class SearchService {
 
         if(applicationConfiguration.isStrictPermissions()
         		&& !identity.hasRole("admin")){
-        	        	
+
             SearchResults searchResults = new SearchResults(0, new ArrayList<SearchResult>() ,
                     SearchResult.SearchResultType.Group);
             return Response.ok(searchResults).build();
-        	
         }
-        
+
         int offset = (validatePage(page) - 1) * validatePageSize(sizePerPage);
         int totalCount;
         List<HIterationGroup> groups;
@@ -211,9 +209,9 @@ public class SearchService {
 
         if(applicationConfiguration.isStrictPermissions()
         		&& !identity.hasRole("admin")){
-            return new SearchResults(0, new ArrayList<SearchResult>(),SearchResult.SearchResultType.Person);        	
+            return new SearchResults(0, new ArrayList<SearchResult>(), SearchResult.SearchResultType.Person);        	
         }    	
-    	
+
         int offset = (validatePage(page) - 1) * validatePageSize(sizePerPage);
 
         int totalCount = personDAO.findAllContainingNameSize(query);
@@ -241,7 +239,7 @@ public class SearchService {
         		&& !identity.hasRole("admin")){
             return new SearchResults(0, new ArrayList<SearchResult>(),SearchResult.SearchResultType.LanguageTeam);        	
         }
-    	
+
         int offset = (validatePage(page) - 1) * validatePageSize(sizePerPage);
         int totalCount = localeDAO.countByNameLike(query);
         List<SearchResult> results = localeDAO

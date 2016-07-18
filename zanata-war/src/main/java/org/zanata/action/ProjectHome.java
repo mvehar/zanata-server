@@ -121,7 +121,7 @@ public class ProjectHome extends SlugHome<HProject> implements
     @Any
     private ProjectSlug projectSlug;
 
-    
+
     /**
      * This field is set from form input which can differ from original slug
      */
@@ -179,7 +179,7 @@ public class ProjectHome extends SlugHome<HProject> implements
 
     @Inject
     private UrlUtil urlUtil;
-    
+
     @Inject
     private ApplicationConfiguration applicationConfiguration;
 
@@ -265,7 +265,6 @@ public class ProjectHome extends SlugHome<HProject> implements
 
     private Map<ValidationId, ValidationAction> availableValidations = Maps
             .newHashMap();
-
 
     @Getter(lazy = true)
     private final List<HProjectIteration> versions = fetchVersions();

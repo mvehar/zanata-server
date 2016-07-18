@@ -50,7 +50,6 @@ public class HApplicationConfiguration extends ModelEntityBase {
      */
     @Deprecated
     public static String KEY_HELP_CONTENT = "pages.help.content";
-
     public static String KEY_HOST = "host.url";
     public static String KEY_REGISTER = "register.url";
     public static String KEY_DOMAIN = "email.domain";
@@ -68,11 +67,7 @@ public class HApplicationConfiguration extends ModelEntityBase {
     public static String KEY_MAX_CONCURRENT_REQ_PER_API_KEY = "max.concurrent.req.per.apikey";
     public static String KEY_MAX_ACTIVE_REQ_PER_API_KEY = "max.active.req.per.apikey";
     public static String KEY_MAX_FILES_PER_UPLOAD = "fileupload.max.files.per.upload";
-    
     public static String KEY_STRICT_PERMISSIONS = "permissions.strict";
-
-
-    private static final long serialVersionUID = 8652817113098817448L;
 
     private static List<String> availableKeys;
 

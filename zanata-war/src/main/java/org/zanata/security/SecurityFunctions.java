@@ -358,16 +358,39 @@ public class SecurityFunctions extends PermissionProvider {
     @GrantsPermission(actions = "import-translation")
     public boolean canImportTranslation(
             HProjectIteration projectIteration) {
-        return isLoggedIn()
-                && isProjectMaintainer(projectIteration.getProject());
+        
+    	boolean canImport = false;
+    	
+    	if(isLoggedIn()){
+    		
+    		if(applicationConfiguration.isStrictPermissions()){
+        		canImport = isUserAllowedAccess(projectIteration.getProject());
+        	}else{
+        		canImport = isProjectMaintainer(projectIteration.getProject());
+
+        	}
+
+    	}
+
+    	return canImport;
+    	
     }
 
     /* Project Translation Maintainer can import translation (merge type is IMPORT) */
     @GrantsPermission(actions = "import-translation")
     public boolean translationMaintainerCanImportTranslation(
             HProjectIteration projectIteration) {
-        return isLoggedIn()
-                && isProjectTranslationMaintainer(projectIteration.getProject());
+        
+    	boolean canImport = false;
+    	
+    	if(isLoggedIn()){
+    		if(applicationConfiguration.isStrictPermissions()){
+        		canImport = isUserAllowedAccess(projectIteration.getProject());
+        	}else{
+        		canImport = isProjectMaintainer(projectIteration.getProject());
+        	}
+    	}
+    	return canImport;
     }
 
     /* Membership in global language teams. */

@@ -14,6 +14,19 @@
   <ui:define name="center_content">
       <h1 class="txt--meta l--push-all-0">#{msgs['jsf.Administration']}</h1>
       <ul class="g g--tighter l--push-top-1">
+         <li class="g__item w--1-3-l w--1-2-m w--1-5 l--push-bottom-1">
+          <h:link id="Admin_Permissions_home"
+            outcome="/admin/permissions.xhtml"
+            styleClass="bg--pop-high bg--highest--hover bx--block">
+          <div class="l--pad-all-half">
+            <i class="i i--settings gamma"></i>
+            <span class="l--pad-left-1 zeta">
+              #{msgs['jsf.Permissions']}
+            </span>
+          </div>
+          </h:link>
+        </li>
+        
         <li class="g__item w--1-3-l w--1-2-m w--1-5 l--push-bottom-1">
           <h:link id="Admin_Server_configuration_home"
             outcome="/admin/server_configuration.xhtml"
