@@ -20,28 +20,25 @@
  */
 package org.zanata.action;
 
-import org.apache.commons.lang.StringUtils;
-
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.apache.deltaspike.jpa.api.transaction.Transactional;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.deltaspike.jpa.api.transaction.Transactional;
 import org.zanata.ApplicationConfiguration;
-import org.zanata.rest.editor.dto.BuildInfo;
 import org.zanata.security.ZanataIdentity;
 import org.zanata.util.UrlUtil;
 
 /**
- * This class serves as a UI proxy for the application configuration bean.
- * It offers methods that help figuring out how to present certain options
+ * This class serves as a UI proxy for the application configuration bean. It
+ * offers methods that help figuring out how to present certain options
  * depending on the application configuration.
  *
- * @author Carlos Munoz <a
- *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
+ * @author Carlos Munoz
+ *         <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
 @Named("applicationConfigurationAction")
 @Dependent
@@ -55,57 +52,53 @@ public class ApplicationConfigurationAction {
     private UrlUtil urlUtil;
 
     public boolean isLoginHandledByInternalPage() {
-        return applicationConfiguration.isInternalAuth()
-                || applicationConfiguration.isJaasAuth()
-                || (applicationConfiguration.isOpenIdAuth() && !applicationConfiguration
-                        .isSingleOpenIdProvider());
+        return applicationConfiguration.isInternalAuth() || applicationConfiguration.isJaasAuth()
+                || (applicationConfiguration.isOpenIdAuth() && !applicationConfiguration.isSingleOpenIdProvider());
     }
 
     public boolean isRegistrationLinkNeeded() {
-        return !applicationConfiguration.isInternalAuth()
-                && applicationConfiguration.getRegisterPath() != null
+        return !applicationConfiguration.isInternalAuth() && applicationConfiguration.getRegisterPath() != null
                 && !applicationConfiguration.getRegisterPath().isEmpty();
     }
 
     public boolean isSingleOpenId() {
-        return applicationConfiguration.isOpenIdAuth()
-                && applicationConfiguration.isSingleOpenIdProvider();
+        return applicationConfiguration.isOpenIdAuth() && applicationConfiguration.isSingleOpenIdProvider();
     }
 
     public String getHelpUrl() {
-        if(!StringUtils.isEmpty(applicationConfiguration.getHelpUrl())) {
+        if (!StringUtils.isEmpty(applicationConfiguration.getHelpUrl())) {
             return applicationConfiguration.getHelpUrl();
         }
         return ServerConfigurationBean.DEFAULT_HELP_URL;
     }
 
     public String getTermOfUseUrl() {
-        if(!StringUtils.isEmpty(applicationConfiguration.getTermsOfUseUrl())) {
+        if (!StringUtils.isEmpty(applicationConfiguration.getTermsOfUseUrl())) {
             return applicationConfiguration.getTermsOfUseUrl();
         }
         return ServerConfigurationBean.DEFAULT_TERM_OF_USE_URL;
     }
 
     public String getLoginUrl(HttpServletRequest request) {
-        if(applicationConfiguration.isKerberosAuth()) {
+        if (applicationConfiguration.isKerberosAuth()) {
             return "/account/klogin?continue=" + urlUtil.getEncodedLocalUrl(request);
         }
-        if(isSingleOpenId()) {
+        if (isSingleOpenId()) {
             return "/account/singleopenidlogin";
         }
         return "/account/sign_in?continue=" + urlUtil.getEncodedLocalUrl(request);
     }
 
     public String getRegisterUrl() {
-        if(isRegistrationLinkNeeded()) {
+        if (isRegistrationLinkNeeded()) {
             return applicationConfiguration.getRegisterPath();
         }
         return "/account/register";
     }
-    
-    public void restrictedToLoggedIn(ZanataIdentity identity){
-    	if(applicationConfiguration.isRequireLoginHomeSearch()){
-    		identity.checkLoggedIn();
-    	}
+
+    public void restrictedToLoggedIn(ZanataIdentity identity) {
+        if (applicationConfiguration.isRequireLoginHomeSearch()) {
+            identity.checkLoggedIn();
+        }
     }
 }

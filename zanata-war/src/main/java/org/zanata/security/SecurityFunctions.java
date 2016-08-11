@@ -20,7 +20,14 @@
  */
 package org.zanata.security;
 
-import lombok.extern.slf4j.Slf4j;
+import static org.zanata.model.ProjectRole.Maintainer;
+import static org.zanata.model.ProjectRole.TranslationMaintainer;
+
+import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+
 import org.hibernate.Session;
 import org.zanata.ApplicationConfiguration;
 import org.zanata.dao.PersonDAO;
@@ -43,35 +50,28 @@ import org.zanata.security.permission.PermissionProvider;
 import org.zanata.util.HttpUtil;
 import org.zanata.util.ServiceLocator;
 
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
-
-import java.util.Optional;
-
-import static org.zanata.model.ProjectRole.Maintainer;
-import static org.zanata.model.ProjectRole.TranslationMaintainer;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Contains static security rules functions used to determine permissions.
  *
- * <b>NOTE</b>:
- * If you intended to use DAO and execute query in security functions, please
- * make sure you use a new session to execute the query. The reason being, if
- * you update an entity, SmartEntitySecurityListener will perform a check at
- * pre-update. Any query executed within the same session will trigger a flush,
- * which triggers another SmartEntitySecurityListener check and this will run
- * into a loop.
+ * <b>NOTE</b>: If you intended to use DAO and execute query in security
+ * functions, please make sure you use a new session to execute the query. The
+ * reason being, if you update an entity, SmartEntitySecurityListener will
+ * perform a check at pre-update. Any query executed within the same session
+ * will trigger a flush, which triggers another SmartEntitySecurityListener
+ * check and this will run into a loop.
  *
  *
- * @author Carlos Munoz <a
- *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
+ * @author Carlos Munoz
+ *         <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
 @Slf4j
 public class SecurityFunctions extends PermissionProvider {
 
     @Inject
     private ZanataIdentity identity;
-    
+
     @Inject
     private ApplicationConfiguration applicationConfiguration;
 
@@ -100,7 +100,8 @@ public class SecurityFunctions extends PermissionProvider {
         return isProjectRole(project, TranslationMaintainer);
     }
 
-    /* Check whether the authenticated person has the given role in the given
+    /*
+     * Check whether the authenticated person has the given role in the given
      * project.
      */
     private boolean isProjectRole(HProject project, ProjectRole role) {
@@ -109,10 +110,8 @@ public class SecurityFunctions extends PermissionProvider {
 
             // see class level javadoc for why we need a new session here
             try (AutoCloseSession autoCloseSession = newSession()) {
-                ProjectMemberDAO projectMemberDAO =
-                        new ProjectMemberDAO(autoCloseSession.session);
-                return projectMemberDAO
-                        .hasProjectRole(person, project, role);
+                ProjectMemberDAO projectMemberDAO = new ProjectMemberDAO(autoCloseSession.session);
+                return projectMemberDAO.hasProjectRole(person, project, role);
             }
         }
 
@@ -125,20 +124,15 @@ public class SecurityFunctions extends PermissionProvider {
      * @return a new AutoClosable wrapper of a NEW session
      */
     private static AutoCloseSession newSession() {
-        Session session =
-                (Session) ServiceLocator.instance().getEntityManagerFactory()
-                        .createEntityManager().getDelegate();
+        Session session = (Session) ServiceLocator.instance().getEntityManagerFactory().createEntityManager().getDelegate();
         return new AutoCloseSession(session);
     }
 
-    private boolean userHasProjectLanguageRole(HProject project,
-            HLocale lang,
-            LocaleRole role) {
+    private boolean userHasProjectLanguageRole(HProject project, HLocale lang, LocaleRole role) {
 
         if (isLoggedIn()) {
             HPerson person = authenticatedAccount.get().getPerson();
-            return ServiceLocator.instance().getInstance(ProjectLocaleMemberDAO.class)
-                    .hasProjectLocaleRole(person, project, lang, role);
+            return ServiceLocator.instance().getInstance(ProjectLocaleMemberDAO.class).hasProjectLocaleRole(person, project, lang, role);
         }
 
         // No authenticated user
@@ -177,22 +171,21 @@ public class SecurityFunctions extends PermissionProvider {
     /* anyone can read a project */
     @GrantsPermission(actions = "read")
     public boolean canReadProject(HProject target) {
-    	if(applicationConfiguration.isStrictPermissions()){
+        if (applicationConfiguration.isLimitedAccessToProjects()) {
             return isUserAllowedAccess(target);
-    	}
-    	
-    	return true;
+        }
+
+        return true;
     }
-    
 
     /* anyone can read a project iteration */
     @GrantsPermission(actions = "read")
     public boolean canReadProjectIteration(HProjectIteration target) {
-    	if(applicationConfiguration.isStrictPermissions()){
+        if (applicationConfiguration.isLimitedAccessToProjects()) {
             return isUserAllowedAccess(target.getProject());
-    	}
-    	
-    	return true;
+        }
+
+        return true;
     }
 
     /*
@@ -204,8 +197,7 @@ public class SecurityFunctions extends PermissionProvider {
      * requiring the construction of HProjectIteration just to do a permission
      * check.)
      */
-    @GrantsPermission(actions = { "update",
-            "add-iteration" })
+    @GrantsPermission(actions = { "update", "add-iteration" })
     public boolean canUpdateProjectOrAddIteration(HProject project) {
         if (!identity.isLoggedIn()) {
             return false;
@@ -218,10 +210,8 @@ public class SecurityFunctions extends PermissionProvider {
      * Project maintainers may create or edit (but not delete) a project
      * iteration
      */
-    @GrantsPermission(actions = {
-            "insert", "update", "import-template" })
-    public boolean canInsertOrUpdateProjectIteration(
-            HProjectIteration iteration) {
+    @GrantsPermission(actions = { "insert", "update", "import-template" })
+    public boolean canInsertOrUpdateProjectIteration(HProjectIteration iteration) {
         return isProjectMaintainer(iteration.getProject());
     }
 
@@ -235,37 +225,35 @@ public class SecurityFunctions extends PermissionProvider {
      **************************************************************************/
 
     /* Maintainer can manage all project roles */
-    @GrantsPermission(actions = {"manage-members"})
+    @GrantsPermission(actions = { "manage-members" })
     public boolean canManageProjectMembers(HProject project) {
         return identity.isLoggedIn() && isProjectMaintainer(project);
     }
 
     /* Translation Maintainer can manage project translation team */
-    @GrantsPermission(actions = {"manage-translation-members"})
+    @GrantsPermission(actions = { "manage-translation-members" })
     public boolean canManageProjectTranslationMembers(HProject project) {
         // TODO add a DAO check for multiple project roles at once (single query
         // instead of two)
-        return identity.isLoggedIn() &&
-                (isProjectTranslationMaintainer(project) ||
-                isProjectMaintainer(project));
+        return identity.isLoggedIn() && (isProjectTranslationMaintainer(project) || isProjectMaintainer(project));
     }
 
     /***************************************************************************
      * Translation rules
      **************************************************************************/
 
-    /* Global Language Team members can add a translation for their language
-     * teams, unless global translation is restricted. */
+    /*
+     * Global Language Team members can add a translation for their language
+     * teams, unless global translation is restricted.
+     */
     @GrantsPermission(actions = { "add-translation", "modify-translation" })
     public boolean canTranslate(HProject project, HLocale lang) {
-        return project.isAllowGlobalTranslation() &&
-                isUserAllowedAccess(project) && isUserTranslatorOfLanguage(lang);
+        return project.isAllowGlobalTranslation() && isUserAllowedAccess(project) && isUserTranslatorOfLanguage(lang);
     }
 
     public boolean isUserTranslatorOfLanguage(HLocale lang) {
         if (isLoggedIn()) {
-            return personDAO.isUserInLanguageTeamWithRoles(
-                    authenticatedAccount.get().getPerson(), lang, true, null, null);
+            return personDAO.isUserInLanguageTeamWithRoles(authenticatedAccount.get().getPerson(), lang, true, null, null);
         }
 
         return false; // No authenticated user
@@ -286,33 +274,31 @@ public class SecurityFunctions extends PermissionProvider {
         }
     }
 
-    /* Project Language Translators can add a translation for their language
+    /*
+     * Project Language Translators can add a translation for their language
      * regardless of global translation setting.
      */
     @GrantsPermission(actions = { "add-translation", "modify-translation" })
     public boolean projectTranslatorCanTranslate(HProject project, HLocale lang) {
-        return isLoggedIn() &&
-                userHasProjectLanguageRole(project, lang, LocaleRole.Translator);
+        return isLoggedIn() && userHasProjectLanguageRole(project, lang, LocaleRole.Translator);
     }
 
     /***************************************************************************
      * Review translation rules
      **************************************************************************/
-    /* Global Language Team reviewer can approve/reject translation, unless
-     * global translation is restricted. */
+    /*
+     * Global Language Team reviewer can approve/reject translation, unless
+     * global translation is restricted.
+     */
     // TODO Unify these two permission actions into a single one
-    @GrantsPermission(
-            actions = { "review-translation", "translation-review" })
-    public boolean
-            canReviewTranslation(HProject project, HLocale locale) {
-        return project.isAllowGlobalTranslation() &&
-                isUserAllowedAccess(project) && isUserReviewerOfLanguage(locale);
+    @GrantsPermission(actions = { "review-translation", "translation-review" })
+    public boolean canReviewTranslation(HProject project, HLocale locale) {
+        return project.isAllowGlobalTranslation() && isUserAllowedAccess(project) && isUserReviewerOfLanguage(locale);
     }
 
     public boolean isUserReviewerOfLanguage(HLocale lang) {
         if (isLoggedIn()) {
-            return personDAO.isUserInLanguageTeamWithRoles(
-                    authenticatedAccount.get().getPerson(), lang, null, true, null);
+            return personDAO.isUserInLanguageTeamWithRoles(authenticatedAccount.get().getPerson(), lang, null, true, null);
         } else {
             return false;
         }
@@ -323,78 +309,73 @@ public class SecurityFunctions extends PermissionProvider {
      * Project Maintainers can add, modify or review a translation for their
      * projects
      */
-    @GrantsPermission(actions = { "add-translation", "modify-translation",
-            "review-translation", "translation-review" })
-    public boolean canAddOrReviewTranslation(
-            HProject project, HLocale locale) {
+    @GrantsPermission(actions = { "add-translation", "modify-translation", "review-translation", "translation-review" })
+    public boolean canAddOrReviewTranslation(HProject project, HLocale locale) {
         return isLoggedIn() && isProjectMaintainer(project);
     }
 
-    /* Project Translation Maintainers can add, modify or review a translation
+    /*
+     * Project Translation Maintainers can add, modify or review a translation
      * for their projects.
      */
-    @GrantsPermission(actions = { "add-translation", "modify-translation",
-            "review-translation", "translation-review" })
-    public boolean translationMaintainerCanTranslate(HProject project,
-                                                            HLocale locale) {
-        return isLoggedIn() && isProjectTranslationMaintainer(
-                project);
+    @GrantsPermission(actions = { "add-translation", "modify-translation", "review-translation", "translation-review" })
+    public boolean translationMaintainerCanTranslate(HProject project, HLocale locale) {
+        return isLoggedIn() && isProjectTranslationMaintainer(project);
     }
 
-    /* Project Translation Reviewer can perform translation and review for their
+    /*
+     * Project Translation Reviewer can perform translation and review for their
      * language in the project, regardless of global translation permission.
      */
-    @GrantsPermission(actions = { "add-translation", "modify-translation",
-            "review-translation", "translation-review" })
+    @GrantsPermission(actions = { "add-translation", "modify-translation", "review-translation", "translation-review" })
     public boolean projectReviewerCanTranslateAndReview(HProject project, HLocale lang) {
-        return isLoggedIn() &&
-                userHasProjectLanguageRole(project, lang, LocaleRole.Reviewer);
+        return isLoggedIn() && userHasProjectLanguageRole(project, lang, LocaleRole.Reviewer);
     }
 
     /* Project Maintainer can import translation (merge type is IMPORT) */
     @GrantsPermission(actions = "import-translation")
-    public boolean canImportTranslation(
-            HProjectIteration projectIteration) {
-        
-    	boolean canImport = false;
-    	
-    	if(isLoggedIn()){
-    		
-    		if(applicationConfiguration.isStrictPermissions()){
-        		canImport = isUserAllowedAccess(projectIteration.getProject());
-        	}else{
-        		canImport = isProjectMaintainer(projectIteration.getProject());
+    public boolean canImportTranslation(HProjectIteration projectIteration) {
 
-        	}
+        boolean canImport = false;
 
-    	}
+        if (isLoggedIn()) {
 
-    	return canImport;
-    	
+            if (applicationConfiguration.isLimitedAccessToUpload()) {
+                canImport = isUserAllowedAccess(projectIteration.getProject());
+            } else {
+                canImport = isProjectMaintainer(projectIteration.getProject());
+
+            }
+
+        }
+
+        return canImport;
+
     }
 
-    /* Project Translation Maintainer can import translation (merge type is IMPORT) */
+    /*
+     * Project Translation Maintainer can import translation (merge type is
+     * IMPORT)
+     */
     @GrantsPermission(actions = "import-translation")
-    public boolean translationMaintainerCanImportTranslation(
-            HProjectIteration projectIteration) {
-        
-    	boolean canImport = false;
-    	
-    	if(isLoggedIn()){
-    		if(applicationConfiguration.isStrictPermissions()){
-        		canImport = isUserAllowedAccess(projectIteration.getProject());
-        	}else{
-        		canImport = isProjectMaintainer(projectIteration.getProject());
-        	}
-    	}
-    	return canImport;
+    public boolean translationMaintainerCanImportTranslation(HProjectIteration projectIteration) {
+
+        boolean canImport = false;
+
+        if (isLoggedIn()) {
+            if (applicationConfiguration.isLimitedAccessToUpload()) {
+                canImport = isUserAllowedAccess(projectIteration.getProject());
+            } else {
+                canImport = isProjectMaintainer(projectIteration.getProject());
+            }
+        }
+        return canImport;
     }
 
     /* Membership in global language teams. */
     public boolean isLanguageTeamMember(HLocale lang) {
         if (isLoggedIn()) {
-            return personDAO.isUserInLanguageTeamWithRoles(
-                    authenticatedAccount.get().getPerson(), lang, null, null, null);
+            return personDAO.isUserInLanguageTeamWithRoles(authenticatedAccount.get().getPerson(), lang, null, null, null);
         } else {
             return false;
         }
@@ -418,8 +399,7 @@ public class SecurityFunctions extends PermissionProvider {
     }
 
     /* 'glossarist-admin' can also delete */
-    @GrantsPermission(actions = { "glossary-insert", "glossary-update",
-            "glossary-delete" })
+    @GrantsPermission(actions = { "glossary-insert", "glossary-update", "glossary-delete" })
     public boolean canAdminGlossary() {
         return identity.hasRole("glossary-admin");
     }
@@ -438,8 +418,7 @@ public class SecurityFunctions extends PermissionProvider {
     @GrantsPermission(actions = "manage-language-team")
     public boolean isUserCoordinatorOfLanguage(HLocale lang) {
         if (isLoggedIn()) {
-            return personDAO.isUserInLanguageTeamWithRoles(
-                    authenticatedAccount.get().getPerson(), lang, null, null, true);
+            return personDAO.isUserInLanguageTeamWithRoles(authenticatedAccount.get().getPerson(), lang, null, null, true);
         } else {
             return false;
         }
@@ -448,8 +427,7 @@ public class SecurityFunctions extends PermissionProvider {
 
     /* 'team coordinator' can insert/update/delete language team members */
     @GrantsPermission(actions = { "insert", "update", "delete" })
-    public boolean canModifyLanguageTeamMembers(
-            HLocaleMember localeMember) {
+    public boolean canModifyLanguageTeamMembers(HLocaleMember localeMember) {
         return isUserCoordinatorOfLanguage(localeMember.getSupportedLanguage());
     }
 
@@ -465,8 +443,7 @@ public class SecurityFunctions extends PermissionProvider {
 
     // Only admin can view obsolete project iterations
     @GrantsPermission(actions = "view-obsolete")
-    public boolean canViewObsoleteProjectIteration(
-            HProjectIteration projectIteration) {
+    public boolean canViewObsoleteProjectIteration(HProjectIteration projectIteration) {
         return identity.hasRole("admin");
     }
 
@@ -482,8 +459,7 @@ public class SecurityFunctions extends PermissionProvider {
 
     // Project maintainer can archive/delete project iterations
     @GrantsPermission(actions = "mark-obsolete")
-    public boolean canArchiveProjectIteration(
-            HProjectIteration projectIteration) {
+    public boolean canArchiveProjectIteration(HProjectIteration projectIteration) {
         return isProjectMaintainer(projectIteration.getProject());
     }
 
@@ -505,8 +481,7 @@ public class SecurityFunctions extends PermissionProvider {
      **************************************************************************/
     @GrantsPermission(actions = "update")
     public boolean canUpdateVersionGroup(HIterationGroup group) {
-        return isLoggedIn()
-                && authenticatedAccount.get().getPerson().isMaintainer(group);
+        return isLoggedIn() && authenticatedAccount.get().getPerson().isMaintainer(group);
     }
 
     @GrantsPermission(actions = "insert")
@@ -526,8 +501,7 @@ public class SecurityFunctions extends PermissionProvider {
     /** Admins and Project maintainers can perform copy-trans */
     @GrantsPermission(actions = "copy-trans")
     public boolean canRunCopyTrans(HProjectIteration iteration) {
-        return isLoggedIn()
-                && isProjectMaintainer(iteration.getProject());
+        return isLoggedIn() && isProjectMaintainer(iteration.getProject());
     }
 
     /*****************************************************************************************
@@ -536,35 +510,27 @@ public class SecurityFunctions extends PermissionProvider {
 
     @GrantsPermission(actions = "review-comment")
     public boolean canCommentOnReview(HLocale locale, HProject project) {
-        return project.isAllowGlobalTranslation() &&
-                isUserAllowedAccess(project) && isLanguageTeamMember(locale);
+        return project.isAllowGlobalTranslation() && isUserAllowedAccess(project) && isLanguageTeamMember(locale);
     }
 
     @GrantsPermission(actions = "review-comment")
-    public boolean canMaintainerCommentOnReview(HLocale locale,
-            HProject project) {
+    public boolean canMaintainerCommentOnReview(HLocale locale, HProject project) {
         return isLoggedIn() && isProjectMaintainer(project);
     }
 
     @GrantsPermission(actions = "review-comment")
-    public boolean canTranslationMaintainerCommentOnReview(HLocale locale,
-            HProject project) {
-        return isLoggedIn()
-                && isProjectTranslationMaintainer(project);
+    public boolean canTranslationMaintainerCommentOnReview(HLocale locale, HProject project) {
+        return isLoggedIn() && isProjectTranslationMaintainer(project);
     }
 
     @GrantsPermission(actions = "review-comment")
-    public boolean canReviewerCommentOnReview(HLocale locale,
-            HProject project) {
-        return isLoggedIn() &&
-                userHasProjectLanguageRole(project, locale, LocaleRole.Reviewer);
+    public boolean canReviewerCommentOnReview(HLocale locale, HProject project) {
+        return isLoggedIn() && userHasProjectLanguageRole(project, locale, LocaleRole.Reviewer);
     }
 
     @GrantsPermission(actions = "review-comment")
-    public boolean canTranslatorCommentOnReview(HLocale locale,
-            HProject project) {
-        return isLoggedIn() &&
-                userHasProjectLanguageRole(project, locale, LocaleRole.Translator);
+    public boolean canTranslatorCommentOnReview(HLocale locale, HProject project) {
+        return isLoggedIn() && userHasProjectLanguageRole(project, locale, LocaleRole.Translator);
     }
 
     /*****************************************************************************************
@@ -576,27 +542,26 @@ public class SecurityFunctions extends PermissionProvider {
         return isLoggedIn();
     }
 
-
     /*****************************************************************************************
      * HTTP request rules
      ******************************************************************************************/
 
     /**
-     * Check if user can access to REST URL with httpMethod.
-     * 1) Check if request can communicate to with rest service path,
-     * 2) then check if request can perform the specific API action.
+     * Check if user can access to REST URL with httpMethod. 1) Check if request
+     * can communicate to with rest service path, 2) then check if request can
+     * perform the specific API action.
      *
      *
      * This rule apply to all REST endpoint.
      *
-     * @param identity - zanata identity representing authenticated account
-     * @param restServicePath - service path of rest request.
-     *                        See annotation @Path in REST service class.
+     * @param identity
+     *            - zanata identity representing authenticated account
+     * @param restServicePath
+     *            - service path of rest request. See annotation @Path in REST
+     *            service class.
      */
-    public static boolean canAccessRestPath(
-            @Nonnull ZanataIdentity identity,
-            String restServicePath) {
-        if(isLocalesServicePath(restServicePath)) {
+    public static boolean canAccessRestPath(@Nonnull ZanataIdentity identity, String restServicePath) {
+        if (isLocalesServicePath(restServicePath)) {
             log.debug("Allow rest access for /locales path (Zanata UI)");
             return true;
         }
@@ -605,50 +570,47 @@ public class SecurityFunctions extends PermissionProvider {
     }
 
     /**
-     * Check if the REST api allow anonymous access
-     * If request is from anonymous user,
-     * only 'Read' action and certain specific endpoints are allowed.
+     * Check if the REST api allow anonymous access If request is from anonymous
+     * user, only 'Read' action and certain specific endpoints are allowed.
      * Additionally, role-based check will be performed in the REST service
      * class.
-     * @param httpMethod {@link javax.ws.rs.HttpMethod}
-     * @param servicePath service path of rest request.
-     *                        See annotation @Path in REST service class.
+     *
+     * @param httpMethod
+     *            {@link javax.ws.rs.HttpMethod}
+     * @param servicePath
+     *            service path of rest request. See annotation @Path in REST
+     *            service class.
      * @return
      */
-    public static boolean doesRestPathAllowAnonymousAccess(String httpMethod,
-            String servicePath) {
-        return HttpUtil.isReadMethod(httpMethod) ||
-                isTestServicePath(servicePath) ||
-                isRefreshingOAuthAccessToken(servicePath);
+    public static boolean doesRestPathAllowAnonymousAccess(String httpMethod, String servicePath) {
+        return HttpUtil.isReadMethod(httpMethod) || isTestServicePath(servicePath) || isRefreshingOAuthAccessToken(servicePath);
     }
 
     private static boolean isRefreshingOAuthAccessToken(String servicePath) {
-        return servicePath != null &&
-                servicePath.startsWith("/oauth/token");
+        return servicePath != null && servicePath.startsWith("/oauth/token");
     }
 
     /**
      * Check if request path are from functional test or RestTest
      *
-     * @param servicePath - service path of rest request.
-     *                        See annotation @Path in REST service class.
+     * @param servicePath
+     *            - service path of rest request. See annotation @Path in REST
+     *            service class.
      */
     private static boolean isTestServicePath(String servicePath) {
         // This is to allow data injection for function-test/rest-test
-        return servicePath != null
-                &&
-                // when being called in ZanataRestSecurityInterceptor
+        return servicePath != null &&
+        // when being called in ZanataRestSecurityInterceptor
                 servicePath.startsWith("/test/");
     }
 
     /**
-     * Check if request path is Zanata UI locale endpoint.
-     * This endpoint is used for getting list of locales internationalised
-     * in Zanata, update locale in Zanata instance.
+     * Check if request path is Zanata UI locale endpoint. This endpoint is used
+     * for getting list of locales internationalised in Zanata, update locale in
+     * Zanata instance.
      */
     private static boolean isLocalesServicePath(String servicePath) {
-        return servicePath != null && servicePath.contains("/rest" +
-            LocalesResource.SERVICE_PATH);
+        return servicePath != null && servicePath.contains("/rest" + LocalesResource.SERVICE_PATH);
     }
 
     private static class AutoCloseSession implements AutoCloseable {

@@ -20,6 +20,8 @@
  */
 package org.zanata;
 
+import static java.lang.Math.max;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,47 +30,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Produces;
-
-import com.google.common.base.Optional;
-import lombok.extern.slf4j.Slf4j;
-import lombok.Getter;
-import lombok.Setter;
-
-import org.apache.deltaspike.core.api.common.DeltaSpike;
-import org.apache.log4j.Level;
-import javax.annotation.PostConstruct;
-import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpSession;
 
+import org.apache.deltaspike.core.api.common.DeltaSpike;
+import org.apache.log4j.Level;
+import org.zanata.config.DatabaseBackedConfig;
+import org.zanata.config.JaasConfig;
 import org.zanata.config.OAuthTokenExpiryInSeconds;
 import org.zanata.config.SupportOAuth;
 import org.zanata.config.SystemPropertyConfigStore;
-import org.zanata.servlet.HttpRequestAndSessionHolder;
-import org.zanata.servlet.annotations.ServerPath;
-import org.zanata.util.DefaultLocale;
-import org.zanata.util.Synchronized;
-import org.zanata.config.DatabaseBackedConfig;
-import org.zanata.config.JaasConfig;
 import org.zanata.events.LogoutEvent;
 import org.zanata.events.PostAuthenticateEvent;
 import org.zanata.i18n.Messages;
 import org.zanata.log4j.ZanataHTMLLayout;
 import org.zanata.log4j.ZanataSMTPAppender;
 import org.zanata.security.AuthenticationType;
+import org.zanata.security.OpenIdLoginModule;
+import org.zanata.servlet.HttpRequestAndSessionHolder;
+import org.zanata.servlet.annotations.ServerPath;
+import org.zanata.util.DefaultLocale;
+import org.zanata.util.Synchronized;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.zanata.security.OpenIdLoginModule;
 
-import static java.lang.Math.max;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Named("applicationConfiguration")
 @ApplicationScoped
@@ -77,29 +75,27 @@ import static java.lang.Math.max;
 public class ApplicationConfiguration implements Serializable {
     private static final long serialVersionUID = -4970657841198107092L;
 
-    private static final String EMAIL_APPENDER_NAME =
-            "zanata.log.appender.email";
+    private static final String EMAIL_APPENDER_NAME = "zanata.log.appender.email";
 
     @Getter
     private static final int defaultMaxFilesPerUpload = 100;
 
     @Getter
     private static final int defaultAnonymousSessionTimeoutMinutes = 30;
-    public static final String ACCESS_TOKEN_EXPIRES_IN_SECONDS =
-            "accessTokenExpiresInSeconds";
+    public static final String ACCESS_TOKEN_EXPIRES_IN_SECONDS = "accessTokenExpiresInSeconds";
 
     @Inject
     private DatabaseBackedConfig databaseBackedConfig;
     @Inject
     private JaasConfig jaasConfig;
-    @Inject @DefaultLocale
+    @Inject
+    @DefaultLocale
     private Messages msgs;
 
     @Inject
     private SystemPropertyConfigStore sysPropConfigStore;
 
-    private static final ZanataSMTPAppender smtpAppenderInstance =
-            new ZanataSMTPAppender();
+    private static final ZanataSMTPAppender smtpAppenderInstance = new ZanataSMTPAppender();
 
     @Getter
     private int authenticatedSessionTimeoutMinutes;
@@ -124,25 +120,22 @@ public class ApplicationConfiguration implements Serializable {
     private HttpSession session;
 
     /**
-     * To be used with single sign-up module with openId. Default is false
+     * To be used with single sign-up module with openId. Default is false When
+     * set to true: This is to enforce username to match with username returned
+     * from openId server when new user register. Usage: server administrator
+     * can enable this in system property zanata.enforce.matchingusernames. In
+     * standalone.xml:
      *
-     * When set to true:
-     *
-     * This is to enforce username to match with username returned from
-     * openId server when new user register.
-     *
-     * Usage:
-     * server administrator can enable this in system property zanata.enforce.matchingusernames.
-     * In standalone.xml:
      * <pre>
-     *   {@code <property name="zanata.enforce.matchingusernames" value="true" />}
+     *   {@code <property name="zanata.enforce.matchingusernames" value=
+    "true" />}
      * </pre>
      */
+
     @Getter
     private boolean enforceMatchingUsernames;
 
-    private Map<AuthenticationType, String> loginModuleNames = Maps
-            .newHashMap();
+    private Map<AuthenticationType, String> loginModuleNames = Maps.newHashMap();
 
     private Set<String> adminUsers;
 
@@ -156,12 +149,9 @@ public class ApplicationConfiguration implements Serializable {
         this.validateConfiguration();
         this.applyLoggingConfiguration();
         this.loadJaasConfig();
-        authenticatedSessionTimeoutMinutes = sysPropConfigStore
-                .get("authenticatedSessionTimeoutMinutes", 180);
-        enforceMatchingUsernames = Boolean
-            .parseBoolean(sysPropConfigStore.get("zanata.enforce.matchingusernames"));
-        tokenExpiresInSeconds =
-                sysPropConfigStore.getLong(ACCESS_TOKEN_EXPIRES_IN_SECONDS, 3600);
+        authenticatedSessionTimeoutMinutes = sysPropConfigStore.get("authenticatedSessionTimeoutMinutes", 180);
+        enforceMatchingUsernames = Boolean.parseBoolean(sysPropConfigStore.get("zanata.enforce.matchingusernames"));
+        tokenExpiresInSeconds = sysPropConfigStore.getLong(ACCESS_TOKEN_EXPIRES_IN_SECONDS, 3600);
     }
 
     /**
@@ -169,17 +159,12 @@ public class ApplicationConfiguration implements Serializable {
      * configuration
      */
     private void loadLoginModuleNames() {
-        for (String policyName : sysPropConfigStore
-                .getEnabledAuthenticationPolicies()) {
+        for (String policyName : sysPropConfigStore.getEnabledAuthenticationPolicies()) {
             try {
-                AuthenticationType authType =
-                        AuthenticationType.valueOf(policyName.toUpperCase());
-                loginModuleNames.put(authType,
-                        sysPropConfigStore.getAuthPolicyName(policyName));
+                AuthenticationType authType = AuthenticationType.valueOf(policyName.toUpperCase());
+                loginModuleNames.put(authType, sysPropConfigStore.getAuthPolicyName(policyName));
             } catch (IllegalArgumentException e) {
-                log.warn(
-                        "Attempted to configure an unrecognized authentication policy: " +
-                                policyName);
+                log.warn("Attempted to configure an unrecognized authentication policy: " + policyName);
             }
         }
     }
@@ -192,19 +177,15 @@ public class ApplicationConfiguration implements Serializable {
         // Validate that only internal / openid authentication is enabled at
         // once
         if (loginModuleNames.size() > 2) {
-            throw new RuntimeException(
-                    "Multiple invalid authentication types present in Zanata configuration.");
+            throw new RuntimeException("Multiple invalid authentication types present in Zanata configuration.");
         } else if (loginModuleNames.size() == 2) {
             // Internal and Open id are the only allowed combined authentication
             // types
-            if (!(loginModuleNames.containsKey(AuthenticationType.OPENID) && loginModuleNames
-                    .containsKey(AuthenticationType.INTERNAL))) {
-                throw new RuntimeException(
-                        "Multiple invalid authentication types present in Zanata configuration.");
+            if (!(loginModuleNames.containsKey(AuthenticationType.OPENID) && loginModuleNames.containsKey(AuthenticationType.INTERNAL))) {
+                throw new RuntimeException("Multiple invalid authentication types present in Zanata configuration.");
             }
         } else if (loginModuleNames.size() < 1) {
-            throw new RuntimeException(
-                    "At least one authentication type must be configured in Zanata configuration.");
+            throw new RuntimeException("At least one authentication type must be configured in Zanata configuration.");
         }
     }
 
@@ -220,16 +201,13 @@ public class ApplicationConfiguration implements Serializable {
             // host or port)
             smtpAppenderInstance.setName(EMAIL_APPENDER_NAME);
             smtpAppenderInstance.setFrom(getFromEmailAddr());
-            smtpAppenderInstance.setTo(databaseBackedConfig
-                    .getLogEventsDestinationEmailAddress());
+            smtpAppenderInstance.setTo(databaseBackedConfig.getLogEventsDestinationEmailAddress());
             // TODO use hostname, not URL
-            smtpAppenderInstance.setSubject("%p log message from Zanata at "
-                    + this.getServerPath());
+            smtpAppenderInstance.setSubject("%p log message from Zanata at " + this.getServerPath());
             smtpAppenderInstance.setLayout(new ZanataHTMLLayout());
             // smtpAppenderInstance.setLayout(new
             // PatternLayout("%-5p [%c] %m%n"));
-            smtpAppenderInstance
-                    .setThreshold(Level.toLevel(getEmailLogLevel()));
+            smtpAppenderInstance.setThreshold(Level.toLevel(getEmailLogLevel()));
             smtpAppenderInstance.setTimeout(60); // will aggregate identical
                                                  // messages within 60 sec
                                                  // periods
@@ -237,8 +215,7 @@ public class ApplicationConfiguration implements Serializable {
 
             // Safe to add more than once
             rootLogger.addAppender(smtpAppenderInstance);
-            log.info("Email log appender is enabled [level: "
-                    + smtpAppenderInstance.getThreshold().toString() + "]");
+            log.info("Email log appender is enabled [level: " + smtpAppenderInstance.getThreshold().toString() + "]");
         } else {
             rootLogger.removeAppender(EMAIL_APPENDER_NAME);
             log.info("Email log appender is disabled.");
@@ -250,13 +227,8 @@ public class ApplicationConfiguration implements Serializable {
      */
     private void loadJaasConfig() {
         if (loginModuleNames.containsKey(AuthenticationType.OPENID)) {
-            openIdProvider =
-                    Optional.fromNullable(jaasConfig
-                            .getAppConfigurationProperty(
-                                    loginModuleNames
-                                            .get(AuthenticationType.OPENID),
-                                    OpenIdLoginModule.class,
-                                    OpenIdLoginModule.OPEN_ID_PROVIDER_KEY));
+            openIdProvider = Optional.fromNullable(jaasConfig.getAppConfigurationProperty(loginModuleNames.get(AuthenticationType.OPENID),
+                    OpenIdLoginModule.class, OpenIdLoginModule.OPEN_ID_PROVIDER_KEY));
         } else {
             openIdProvider = Optional.absent();
         }
@@ -301,15 +273,13 @@ public class ApplicationConfiguration implements Serializable {
         emailAddr = databaseBackedConfig.getFromEmailAddress();
 
         // Look in the properties file next
-        if (emailAddr == null
-                && sysPropConfigStore.getDefaultFromEmailAddress() != null) {
+        if (emailAddr == null && sysPropConfigStore.getDefaultFromEmailAddress() != null) {
             emailAddr = sysPropConfigStore.getDefaultFromEmailAddress();
         }
 
         // Finally, just throw an Exception
         if (emailAddr == null) {
-            throw new RuntimeException(
-                    "'From' email address has not been defined in either zanata.properties or Zanata setup");
+            throw new RuntimeException("'From' email address has not been defined in either zanata.properties or Zanata setup");
         }
         return emailAddr;
     }
@@ -344,8 +314,7 @@ public class ApplicationConfiguration implements Serializable {
         } else if (isKerberosAuth()) {
             return AuthenticationType.KERBEROS;
         }
-        throw new RuntimeException(
-                "only supports internal, jaas, or kerberos authentication");
+        throw new RuntimeException("only supports internal, jaas, or kerberos authentication");
     }
 
     public String getOpenIdProviderUrl() {
@@ -369,12 +338,9 @@ public class ApplicationConfiguration implements Serializable {
     }
 
     public Set<String> getAdminUsers() {
-        String configValue =
-                Strings.nullToEmpty(sysPropConfigStore.getAdminUsersList());
+        String configValue = Strings.nullToEmpty(sysPropConfigStore.getAdminUsersList());
         if (adminUsers == null) {
-            adminUsers =
-                    Sets.newHashSet(Splitter.on(",").omitEmptyStrings()
-                            .trimResults().split(configValue));
+            adminUsers = Sets.newHashSet(Splitter.on(",").omitEmptyStrings().trimResults().split(configValue));
         }
         return adminUsers;
     }
@@ -438,15 +404,12 @@ public class ApplicationConfiguration implements Serializable {
     }
 
     public String copyrightNotice() {
-        return msgs.format("jsf.CopyrightNotice",
-                String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
+        return msgs.format("jsf.CopyrightNotice", String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
     }
 
-    public void setAuthenticatedSessionTimeout(
-            @Observes PostAuthenticateEvent payload) {
+    public void setAuthenticatedSessionTimeout(@Observes PostAuthenticateEvent payload) {
         if (session != null) {
-            int timeoutInSecs = max(authenticatedSessionTimeoutMinutes * 60,
-                    defaultAnonymousSessionTimeoutMinutes * 60);
+            int timeoutInSecs = max(authenticatedSessionTimeoutMinutes * 60, defaultAnonymousSessionTimeoutMinutes * 60);
             session.setMaxInactiveInterval(timeoutInSecs);
         }
     }
@@ -455,12 +418,10 @@ public class ApplicationConfiguration implements Serializable {
         // if we use ServiceLocator and get deltaspike session, upon invoking
         // setMaxInactiveInterval method, it will throw Request Scope not active
         // exception
-        java.util.Optional<HttpSession> httpSession =
-                HttpRequestAndSessionHolder.getHttpSession(false);
+        java.util.Optional<HttpSession> httpSession = HttpRequestAndSessionHolder.getHttpSession(false);
 
         if (httpSession.isPresent()) {
-            httpSession.get().setMaxInactiveInterval(
-                        defaultAnonymousSessionTimeoutMinutes * 60);
+            httpSession.get().setMaxInactiveInterval(defaultAnonymousSessionTimeoutMinutes * 60);
         }
     }
 
@@ -479,25 +440,29 @@ public class ApplicationConfiguration implements Serializable {
     protected boolean isOAuthSupported() {
         return sysPropConfigStore.isOAuthEnabled();
     }
-    
+
     public boolean isRequireLoginHomeSearch() {
         return databaseBackedConfig.isRequireLoginHomeSearch();
     }
-    
+
     public boolean isLimitedAccessToProjects() {
         return databaseBackedConfig.isLimitedAccessToProjects();
     }
-    
+
     public boolean isLimitedAccessToPeople() {
         return databaseBackedConfig.isLimitedAccessToPeople();
     }
-    
+
     public boolean isLimitedAccessToLanguages() {
         return databaseBackedConfig.isLimitedAccessToLanguages();
     }
-    
+
     public boolean isLimitedAccessToGroups() {
         return databaseBackedConfig.isLimitedAccessToGroups();
     }
-    
+
+    public boolean isLimitedAccessToUpload() {
+        return databaseBackedConfig.isLimitedAccessToUpload();
+    }
+
 }

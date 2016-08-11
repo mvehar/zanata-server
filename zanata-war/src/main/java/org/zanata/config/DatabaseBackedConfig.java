@@ -26,16 +26,16 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.zanata.util.Synchronized;
 import org.zanata.ServerConstants;
 import org.zanata.dao.ApplicationConfigurationDAO;
 import org.zanata.model.HApplicationConfiguration;
+import org.zanata.util.Synchronized;
 
 /**
  * Configuration store implementation that is backed by database tables.
  *
- * @author Carlos Munoz <a
- *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
+ * @author Carlos Munoz
+ *         <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
 @Named("databaseBackedConfig")
 @javax.enterprise.context.ApplicationScoped
@@ -49,8 +49,7 @@ public class DatabaseBackedConfig implements Serializable {
     private ApplicationConfigurationDAO applicationConfigurationDAO;
 
     private @Nullable String getConfigValue(String key) {
-        HApplicationConfiguration configRecord =
-                applicationConfigurationDAO.findByKey(key);
+        HApplicationConfiguration configRecord = applicationConfigurationDAO.findByKey(key);
         return configRecord != null ? configRecord.getValue() : null;
     }
 
@@ -126,24 +125,28 @@ public class DatabaseBackedConfig implements Serializable {
     public boolean isDisplayUserEmail() {
         return Boolean.valueOf(getConfigValue(HApplicationConfiguration.KEY_DISPLAY_USER_EMAIL));
     }
-    
+
     public boolean isRequireLoginHomeSearch() {
         return Boolean.valueOf(getConfigValue(HApplicationConfiguration.KEY_PERMISSIONS_REQUIRE_LOGIN_HOMESEARCH));
     }
-    
+
     public boolean isLimitedAccessToPeople() {
         return Boolean.valueOf(getConfigValue(HApplicationConfiguration.KEY_PERMISSIONS_LIMIT_PEOPLE));
     }
-    
+
     public boolean isLimitedAccessToProjects() {
         return Boolean.valueOf(getConfigValue(HApplicationConfiguration.KEY_PERMISSIONS_LIMIT_PROJECTS));
     }
-    
+
     public boolean isLimitedAccessToLanguages() {
         return Boolean.valueOf(getConfigValue(HApplicationConfiguration.KEY_PERMISSIONS_LIMIT_LANGS));
     }
-    
+
     public boolean isLimitedAccessToGroups() {
         return Boolean.valueOf(getConfigValue(HApplicationConfiguration.KEY_PERMISSIONS_LIMIT_GROUPS));
+    }
+
+    public boolean isLimitedAccessToUpload() {
+        return Boolean.valueOf(getConfigValue(HApplicationConfiguration.KEY_PERMISSIONS_LIMIT_UPLOAD));
     }
 }

@@ -1,91 +1,98 @@
 <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:rich="http://richfaces.org/rich"
-	xmlns:zanata="http://java.sun.com/jsf/composite/zanata"
-	xmlns:a4j="http://richfaces.org/a4j"
-	template="../WEB-INF/template/template.xhtml">
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:zanata="http://java.sun.com/jsf/composite/zanata"
+    xmlns:a4j="http://richfaces.org/a4j"
+    template="../WEB-INF/template/template.xhtml">
 
-	<f:metadata>
-		<f:event type="preRenderView"
-			listener="#{identity.checkRole('admin')}" />
-	</f:metadata>
+    <f:metadata>
+        <f:event type="preRenderView"
+            listener="#{identity.checkRole('admin')}" />
+    </f:metadata>
 
-	<ui:define name="page_title">#{msgs['jsf.Permissions']}</ui:define>
-	<ui:define name="center_content">
-		<div class="g--centered">
-			<div class="g__item w--3-4-m w--5-8-l w--1-3 l--push-bottom-1">
-				<p class="txt--meta l--push-all-0">
-					<h:link outcome="/admin/home.xhtml"
-						value="#{msgs['jsf.Administration']}" />
-				</p>
+    <ui:define name="page_title">#{msgs['jsf.Permissions']}</ui:define>
+    <ui:define name="center_content">
+        <div class="g--centered">
+            <div class="g__item w--3-4-m w--5-8-l w--1-3 l--push-bottom-1">
+                <p class="txt--meta l--push-all-0">
+                    <h:link outcome="/admin/home.xhtml"
+                        value="#{msgs['jsf.Administration']}" />
+                </p>
 
-				<h1 class="l--push-all-0">#{msgs['jsf.Permissions']}</h1>
+                <h1 class="l--push-all-0">#{msgs['jsf.Permissions']}</h1>
 
-				<h:form id="serverConfigForm">
+                <h:form id="serverConfigForm">
 
-					<div class="form__item l--push-top-1">
-						<h3 class="heading--secondary l--push-all-0">#{msgs['jsf.config.userEmail.heading']}</h3>
-						<p>#{msgs['jsf.config.userEmail.description']}</p>
-						<h:outputLabel for="displayUserEmail">#{msgs['jsf.config.userEmail.label']}</h:outputLabel>
-						<h:selectBooleanCheckbox id="displayUserEmail"
-							styleClass="l--push-h-quarter"
-							value="#{serverConfigurationBean.displayUserEmail}" />
-					</div>
+                    <div class="form__item l--push-top-1">
+                        <h3 class="heading--secondary l--push-all-0">#{msgs['jsf.config.userEmail.heading']}</h3>
+                        <p>#{msgs['jsf.config.userEmail.description']}</p>
+                        <h:outputLabel for="displayUserEmail">#{msgs['jsf.config.userEmail.label']}</h:outputLabel>
+                        <h:selectBooleanCheckbox id="displayUserEmail"
+                            styleClass="l--push-h-quarter"
+                            value="#{serverConfigurationBean.displayUserEmail}" />
+                    </div>
 
-					<div class="form__item l--push-top-1">
-						<h3 class="heading--secondary l--push-all-0">#{msgs['jsf.config.permissions.homesearch.heading']}</h3>
-						<p>#{msgs['jsf.config.permissions.homesearch.description']}</p>
-						<h:outputLabel for="requireLoginHomeSearch">#{msgs['jsf.config.permissions.homesearch.label']}</h:outputLabel>
-						<h:selectBooleanCheckbox id="requireLoginHomeSearch"
-							styleClass="l--push-h-quarter"
-							value="#{serverConfigurationBean.requireLoginHomeSearch}" />
-					</div>
+                    <div class="form__item l--push-top-1">
+                        <h3 class="heading--secondary l--push-all-0">#{msgs['jsf.config.permissions.homesearch.heading']}</h3>
+                        <p>#{msgs['jsf.config.permissions.homesearch.description']}</p>
+                        <h:outputLabel for="requireLoginHomeSearch">#{msgs['jsf.config.permissions.homesearch.label']}</h:outputLabel>
+                        <h:selectBooleanCheckbox id="requireLoginHomeSearch"
+                            styleClass="l--push-h-quarter"
+                            value="#{serverConfigurationBean.requireLoginHomeSearch}" />
+                    </div>
 
-					<div class="form__item l--push-top-1">
-						<h3 class="heading--secondary l--push-all-0">#{msgs['jsf.config.permissions.limit.projects.heading']}</h3>
-						<p>#{msgs['jsf.config.permissions.limit.projects.description']}</p>
-						<h:outputLabel for="limitedAccessToProjects">#{msgs['jsf.config.permissions.limit.projects.label']}</h:outputLabel>
-						<h:selectBooleanCheckbox id="limitedAccessToProjects"
-							styleClass="l--push-h-quarter"
-							value="#{serverConfigurationBean.limitedAccessToProjects}" />
-					</div>
-					<div class="form__item l--push-top-1">
-						<h3 class="heading--secondary l--push-all-0">#{msgs['jsf.config.permissions.limit.people.heading']}</h3>
-						<p>#{msgs['jsf.config.permissions.limit.people.description']}</p>
-						<h:outputLabel for="limitedAccessToPeople">#{msgs['jsf.config.permissions.limit.people.label']}</h:outputLabel>
-						<h:selectBooleanCheckbox id="limitedAccessToPeople"
-							styleClass="l--push-h-quarter"
-							value="#{serverConfigurationBean.limitedAccessToPeople}" />
-					</div>
-					<div class="form__item l--push-top-1">
-						<h3 class="heading--secondary l--push-all-0">#{msgs['jsf.config.permissions.limit.groups.heading']}</h3>
-						<p>#{msgs['jsf.config.permissions.limit.groups.description']}</p>
-						<h:outputLabel for="limitedAccessToGroups">#{msgs['jsf.config.permissions.limit.groups.label']}</h:outputLabel>
-						<h:selectBooleanCheckbox id="limitedAccessToGroups"
-							styleClass="l--push-h-quarter"
-							value="#{serverConfigurationBean.limitedAccessToGroups}" />
-					</div>
-					<div class="form__item l--push-top-1">
-						<h3 class="heading--secondary l--push-all-0">#{msgs['jsf.config.permissions.limit.langs.heading']}</h3>
-						<p>#{msgs['jsf.config.permissions.limit.langs.description']}</p>
-						<h:outputLabel for="limitedAccessToLangs">#{msgs['jsf.config.permissions.limit.langs.label']}</h:outputLabel>
-						<h:selectBooleanCheckbox id="limitedAccessToLangs"
-							styleClass="l--push-h-quarter"
-							value="#{serverConfigurationBean.limitedAccessToLangs}" />
-					</div>
+                    <div class="form__item l--push-top-1">
+                        <h3 class="heading--secondary l--push-all-0">#{msgs['jsf.config.permissions.limit.projects.heading']}</h3>
+                        <p>#{msgs['jsf.config.permissions.limit.projects.description']}</p>
+                        <h:outputLabel for="limitedAccessToProjects">#{msgs['jsf.config.permissions.limit.projects.label']}</h:outputLabel>
+                        <h:selectBooleanCheckbox id="limitedAccessToProjects"
+                            styleClass="l--push-h-quarter"
+                            value="#{serverConfigurationBean.limitedAccessToProjects}" />
+                    </div>
+                    <div class="form__item l--push-top-1">
+                        <h3 class="heading--secondary l--push-all-0">#{msgs['jsf.config.permissions.limit.people.heading']}</h3>
+                        <p>#{msgs['jsf.config.permissions.limit.people.description']}</p>
+                        <h:outputLabel for="limitedAccessToPeople">#{msgs['jsf.config.permissions.limit.people.label']}</h:outputLabel>
+                        <h:selectBooleanCheckbox id="limitedAccessToPeople"
+                            styleClass="l--push-h-quarter"
+                            value="#{serverConfigurationBean.limitedAccessToPeople}" />
+                    </div>
+                    <div class="form__item l--push-top-1">
+                        <h3 class="heading--secondary l--push-all-0">#{msgs['jsf.config.permissions.limit.groups.heading']}</h3>
+                        <p>#{msgs['jsf.config.permissions.limit.groups.description']}</p>
+                        <h:outputLabel for="limitedAccessToGroups">#{msgs['jsf.config.permissions.limit.groups.label']}</h:outputLabel>
+                        <h:selectBooleanCheckbox id="limitedAccessToGroups"
+                            styleClass="l--push-h-quarter"
+                            value="#{serverConfigurationBean.limitedAccessToGroups}" />
+                    </div>
+                    <div class="form__item l--push-top-1">
+                        <h3 class="heading--secondary l--push-all-0">#{msgs['jsf.config.permissions.limit.langs.heading']}</h3>
+                        <p>#{msgs['jsf.config.permissions.limit.langs.description']}</p>
+                        <h:outputLabel for="limitedAccessToLangs">#{msgs['jsf.config.permissions.limit.langs.label']}</h:outputLabel>
+                        <h:selectBooleanCheckbox id="limitedAccessToLangs"
+                            styleClass="l--push-h-quarter"
+                            value="#{serverConfigurationBean.limitedAccessToLangs}" />
+                    </div>
+                    <div class="form__item l--push-top-1">
+                        <h3 class="heading--secondary l--push-all-0">#{msgs['jsf.config.permissions.limit.upload.heading']}</h3>
+                        <p>#{msgs['jsf.config.permissions.limit.upload.description']}</p>
+                        <h:outputLabel for="limitedAccessToUpload">#{msgs['jsf.config.permissions.limit.upload.label']}</h:outputLabel>
+                        <h:selectBooleanCheckbox id="limitedAccessToUpload"
+                            styleClass="l--push-h-quarter"
+                            value="#{serverConfigurationBean.limitedAccessToUpload}" />
+                    </div>
 
-
-					<h:commandButton value="#{msgs['jsf.Save']}" id="save"
-						styleClass="button--primary"
-						action="#{serverConfigurationBean.update}" />
-					<h:button outcome="/admin/home.xhtml" value="#{msgs['jsf.Cancel']}"
-						id="cancel" styleClass="button button--link l--push-left-half" />
-				</h:form>
-			</div>
-		</div>
-	</ui:define>
+                    <h:commandButton value="#{msgs['jsf.Save']}" id="save"
+                        styleClass="button--primary"
+                        action="#{serverConfigurationBean.update}" />
+                    <h:button outcome="/admin/home.xhtml" value="#{msgs['jsf.Cancel']}"
+                        id="cancel" styleClass="button button--link l--push-left-half" />
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
 </ui:composition>

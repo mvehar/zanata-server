@@ -20,30 +20,46 @@
  */
 package org.zanata.action;
 
+import static org.zanata.model.HApplicationConfiguration.KEY_ADMIN_EMAIL;
+import static org.zanata.model.HApplicationConfiguration.KEY_DISPLAY_USER_EMAIL;
+import static org.zanata.model.HApplicationConfiguration.KEY_DOMAIN;
+import static org.zanata.model.HApplicationConfiguration.KEY_EMAIL_FROM_ADDRESS;
+import static org.zanata.model.HApplicationConfiguration.KEY_EMAIL_LOG_EVENTS;
+import static org.zanata.model.HApplicationConfiguration.KEY_EMAIL_LOG_LEVEL;
+import static org.zanata.model.HApplicationConfiguration.KEY_HELP_URL;
+import static org.zanata.model.HApplicationConfiguration.KEY_HOME_CONTENT;
+import static org.zanata.model.HApplicationConfiguration.KEY_HOST;
+import static org.zanata.model.HApplicationConfiguration.KEY_LOG_DESTINATION_EMAIL;
+import static org.zanata.model.HApplicationConfiguration.KEY_MAX_ACTIVE_REQ_PER_API_KEY;
+import static org.zanata.model.HApplicationConfiguration.KEY_MAX_CONCURRENT_REQ_PER_API_KEY;
+import static org.zanata.model.HApplicationConfiguration.KEY_MAX_FILES_PER_UPLOAD;
+import static org.zanata.model.HApplicationConfiguration.KEY_PERMISSIONS_LIMIT_GROUPS;
+import static org.zanata.model.HApplicationConfiguration.KEY_PERMISSIONS_LIMIT_LANGS;
+import static org.zanata.model.HApplicationConfiguration.KEY_PERMISSIONS_LIMIT_PEOPLE;
+import static org.zanata.model.HApplicationConfiguration.KEY_PERMISSIONS_LIMIT_PROJECTS;
+import static org.zanata.model.HApplicationConfiguration.KEY_PERMISSIONS_LIMIT_UPLOAD;
+import static org.zanata.model.HApplicationConfiguration.KEY_PERMISSIONS_REQUIRE_LOGIN_HOMESEARCH;
+import static org.zanata.model.HApplicationConfiguration.KEY_PIWIK_IDSITE;
+import static org.zanata.model.HApplicationConfiguration.KEY_PIWIK_URL;
+import static org.zanata.model.HApplicationConfiguration.KEY_REGISTER;
+import static org.zanata.model.HApplicationConfiguration.KEY_TERMS_CONDITIONS_URL;
+
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.event.Event;
 import javax.enterprise.inject.Model;
 import javax.faces.bean.ViewScoped;
-import javax.validation.constraints.Pattern;
-
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.hibernate.validator.constraints.Email;
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.constraints.Pattern;
+
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.deltaspike.jpa.api.transaction.Transactional;
-import org.zanata.security.annotations.CheckLoggedIn;
-import org.zanata.security.annotations.CheckPermission;
-import org.zanata.security.annotations.CheckRole;
+import org.hibernate.validator.constraints.Email;
 import org.zanata.ApplicationConfiguration;
 import org.zanata.action.validator.EmailList;
 import org.zanata.dao.ApplicationConfigurationDAO;
@@ -51,9 +67,13 @@ import org.zanata.events.HomeContentChangedEvent;
 import org.zanata.model.HApplicationConfiguration;
 import org.zanata.model.validator.Url;
 import org.zanata.rest.service.ServerConfigurationService;
+import org.zanata.security.annotations.CheckRole;
 import org.zanata.ui.faces.FacesMessages;
 
-import static org.zanata.model.HApplicationConfiguration.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Named("serverConfigurationBean")
 @ViewScoped
@@ -120,31 +140,40 @@ public class ServerConfigurationBean implements Serializable {
     private boolean displayUserEmail;
     private PropertyWithKey<Boolean> displayUserEmailProperty = new PropertyWithKey<Boolean>("displayUserEmail", KEY_DISPLAY_USER_EMAIL);
 
-    
     @Getter
     @Setter
     private boolean requireLoginHomeSearch;
-    private PropertyWithKey<Boolean> requireLoginHomeSearchProperty = new PropertyWithKey<Boolean>("requireLoginHomeSearch", KEY_PERMISSIONS_REQUIRE_LOGIN_HOMESEARCH);
+    private PropertyWithKey<Boolean> requireLoginHomeSearchProperty = new PropertyWithKey<Boolean>("requireLoginHomeSearch",
+            KEY_PERMISSIONS_REQUIRE_LOGIN_HOMESEARCH);
 
     @Getter
     @Setter
     private boolean limitedAccessToProjects;
-    private PropertyWithKey<Boolean> limitedAccessToProjectsProperty = new PropertyWithKey<Boolean>("limitedAccessToProjects", KEY_PERMISSIONS_LIMIT_PROJECTS);
+    private PropertyWithKey<Boolean> limitedAccessToProjectsProperty = new PropertyWithKey<Boolean>("limitedAccessToProjects",
+            KEY_PERMISSIONS_LIMIT_PROJECTS);
 
     @Getter
     @Setter
     private boolean limitedAccessToPeople;
-    private PropertyWithKey<Boolean> limitedAccessToPeopleProperty = new PropertyWithKey<Boolean>("limitedAccessToPeople", KEY_PERMISSIONS_LIMIT_PEOPLE);
+    private PropertyWithKey<Boolean> limitedAccessToPeopleProperty = new PropertyWithKey<Boolean>("limitedAccessToPeople",
+            KEY_PERMISSIONS_LIMIT_PEOPLE);
 
     @Getter
     @Setter
     private boolean limitedAccessToGroups;
-    private PropertyWithKey<Boolean> limitedAccessToGroupsProperty = new PropertyWithKey<Boolean>("limitedAccessToGroups", KEY_PERMISSIONS_LIMIT_GROUPS);
+    private PropertyWithKey<Boolean> limitedAccessToGroupsProperty = new PropertyWithKey<Boolean>("limitedAccessToGroups",
+            KEY_PERMISSIONS_LIMIT_GROUPS);
 
     @Getter
     @Setter
     private boolean limitedAccessToLangs;
     private PropertyWithKey<Boolean> limitedAccessToLangsProperty = new PropertyWithKey<Boolean>("limitedAccessToLangs", KEY_PERMISSIONS_LIMIT_LANGS);
+
+    @Getter
+    @Setter
+    private boolean limitedAccessToUpload;
+    private PropertyWithKey<Boolean> limitedAccessToUploadProperty = new PropertyWithKey<Boolean>("limitedAccessToUpload",
+            KEY_PERMISSIONS_LIMIT_UPLOAD);
 
     @Getter
     @Setter
@@ -188,16 +217,12 @@ public class ServerConfigurationBean implements Serializable {
     @Setter
     private String maxFilesPerUpload;
 
-    private List<PropertyWithKey<String>> commonStringProperties = Arrays.asList(
-            new PropertyWithKey<String>("registerUrl", KEY_REGISTER),
-            new PropertyWithKey<String>("serverUrl", KEY_HOST),
-            new PropertyWithKey<String>("emailDomain", KEY_DOMAIN),
+    private List<PropertyWithKey<String>> commonStringProperties = Arrays.asList(new PropertyWithKey<String>("registerUrl", KEY_REGISTER),
+            new PropertyWithKey<String>("serverUrl", KEY_HOST), new PropertyWithKey<String>("emailDomain", KEY_DOMAIN),
             new PropertyWithKey<String>("adminEmail", KEY_ADMIN_EMAIL),
             new PropertyWithKey<String>("logDestinationEmails", KEY_LOG_DESTINATION_EMAIL),
-            new PropertyWithKey<String>("logEmailLevel", KEY_EMAIL_LOG_LEVEL),
-            new PropertyWithKey<String>("piwikUrl", KEY_PIWIK_URL),
-            new PropertyWithKey<String>("piwikIdSite", KEY_PIWIK_IDSITE),
-            new PropertyWithKey<String>("termsOfUseUrl", KEY_TERMS_CONDITIONS_URL),
+            new PropertyWithKey<String>("logEmailLevel", KEY_EMAIL_LOG_LEVEL), new PropertyWithKey<String>("piwikUrl", KEY_PIWIK_URL),
+            new PropertyWithKey<String>("piwikIdSite", KEY_PIWIK_IDSITE), new PropertyWithKey<String>("termsOfUseUrl", KEY_TERMS_CONDITIONS_URL),
             new PropertyWithKey<String>("helpUrl", KEY_HELP_URL),
             new PropertyWithKey<String>("maxConcurrentRequestsPerApiKey", KEY_MAX_CONCURRENT_REQ_PER_API_KEY),
             new PropertyWithKey<String>("maxActiveRequestsPerApiKey", KEY_MAX_ACTIVE_REQ_PER_API_KEY),
@@ -208,8 +233,7 @@ public class ServerConfigurationBean implements Serializable {
             new PropertyWithKey<String>("limitedAccessToProjects", KEY_PERMISSIONS_LIMIT_PROJECTS),
             new PropertyWithKey<String>("limitedAccessToGroups", KEY_PERMISSIONS_LIMIT_GROUPS),
             new PropertyWithKey<String>("limitedAccessToLangs", KEY_PERMISSIONS_LIMIT_LANGS),
-            homeContentProperty
-    );
+            new PropertyWithKey<String>("limitedAccessToUpload", KEY_PERMISSIONS_LIMIT_UPLOAD), homeContentProperty);
 
     public String updateHomeContent() {
         persistPropertyToDatabase(homeContentProperty);
@@ -234,9 +258,7 @@ public class ServerConfigurationBean implements Serializable {
     }
 
     private void setPropertyFromConfigIfNotNull(PropertyWithKey<String> property) {
-        HApplicationConfiguration valueHolder =
-                applicationConfigurationDAO
-                        .findByKey(property.getKey());
+        HApplicationConfiguration valueHolder = applicationConfigurationDAO.findByKey(property.getKey());
         if (valueHolder != null) {
             try {
                 property.set(valueHolder.getValue());
@@ -266,14 +288,9 @@ public class ServerConfigurationBean implements Serializable {
         persistPropertiesToDatabase(commonStringProperties);
         persistPropertyToDatabase(fromEmailAddrProperty);
 
-        HApplicationConfiguration emailLogEventsValue =
-                applicationConfigurationDAO
-                        .findByKey(HApplicationConfiguration.KEY_EMAIL_LOG_EVENTS);
+        HApplicationConfiguration emailLogEventsValue = applicationConfigurationDAO.findByKey(HApplicationConfiguration.KEY_EMAIL_LOG_EVENTS);
         if (emailLogEventsValue == null) {
-            emailLogEventsValue =
-                    new HApplicationConfiguration(
-                            HApplicationConfiguration.KEY_EMAIL_LOG_EVENTS,
-                            Boolean.toString(enableLogEmail));
+            emailLogEventsValue = new HApplicationConfiguration(HApplicationConfiguration.KEY_EMAIL_LOG_EVENTS, Boolean.toString(enableLogEmail));
         } else {
             emailLogEventsValue.setValue(Boolean.toString(enableLogEmail));
         }
@@ -292,12 +309,9 @@ public class ServerConfigurationBean implements Serializable {
     }
 
     private void persistPropertyToDatabase(PropertyWithKey<String> property) {
-        HApplicationConfiguration value = applicationConfigurationDAO
-                        .findByKey(property.getKey());
+        HApplicationConfiguration value = applicationConfigurationDAO.findByKey(property.getKey());
         try {
-            ServerConfigurationService.persistApplicationConfig(
-                    property.getKey(), value, property.get(),
-                    applicationConfigurationDAO);
+            ServerConfigurationService.persistApplicationConfig(property.getKey(), value, property.get(), applicationConfigurationDAO);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (NoSuchMethodException e) {
@@ -319,6 +333,7 @@ public class ServerConfigurationBean implements Serializable {
         public void set(T value) throws InvocationTargetException, IllegalAccessException {
             BeanUtils.setProperty(ServerConfigurationBean.this, propertyName, value);
         }
+
         public T get() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
             return (T) BeanUtils.getProperty(ServerConfigurationBean.this, propertyName);
         }

@@ -20,6 +20,20 @@
  */
 package org.zanata.rest.search.service;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.deltaspike.jpa.api.transaction.Transactional;
@@ -43,23 +57,9 @@ import org.zanata.security.ZanataIdentity;
 import org.zanata.security.annotations.Authenticated;
 import org.zanata.service.GravatarService;
 
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-
 /**
- * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
+ * @author Carlos Munoz
+ *         <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
 @RequestScoped
 @Path("/search")
@@ -85,7 +85,8 @@ public class SearchService {
     @Inject
     private ZanataIdentity identity;
 
-    @Inject @Authenticated
+    @Inject
+    @Authenticated
     private HAccount authenticatedAccount;
 
     private static final int MAX_RESULT = 20;
@@ -95,9 +96,7 @@ public class SearchService {
 
     @GET
     @Path("/projects")
-    public Response searchProjects(
-            @QueryParam("q") @DefaultValue("") String query,
-            @DefaultValue("1") @QueryParam("page") int page,
+    public Response searchProjects(@QueryParam("q") @DefaultValue("") String query, @DefaultValue("1") @QueryParam("page") int page,
             @DefaultValue("20") @QueryParam("sizePerPage") int sizePerPage) {
 
         int offset = (validatePage(page) - 1) * validatePageSize(sizePerPage);
@@ -107,25 +106,19 @@ public class SearchService {
             List<HProject> projects;
             if (StringUtils.isEmpty(query)) {
                 totalCount = projectDAO.getFilterProjectSize(false, false, true);
-                projects = projectDAO.getOffsetList(offset,
-                        validatePageSize(sizePerPage), false, false, true);
+                projects = projectDAO.getOffsetList(offset, validatePageSize(sizePerPage), false, false, true);
             } else {
                 totalCount = projectDAO.getQueryProjectSize(query, false);
-                projects =
-                        projectDAO.searchProjects(query,
-                                validatePageSize(sizePerPage), offset,
-                                false);
+                projects = projectDAO.searchProjects(query, validatePageSize(sizePerPage), offset, false);
             }
 
-            //TODO : Quickly fixed, should be refractored
-            if(applicationConfiguration.isLimitedAccessToProjects()){
-            	int original_size = projects.size();
+            // TODO : Quickly fixed, should be refractored
+            if (applicationConfiguration.isLimitedAccessToProjects()) {
+                int original_size = projects.size();
 
-            	projects = projects.stream()
-            			.filter(f -> identity.hasPermission(f, "read"))
-            			.collect(Collectors.toList());
-            	
-            	totalCount = totalCount - (original_size - projects.size());
+                projects = projects.stream().filter(f -> identity.hasPermission(f, "read")).collect(Collectors.toList());
+
+                totalCount = totalCount - (original_size - projects.size());
             }
 
             List<SearchResult> results = projects.stream().map(p -> {
@@ -137,28 +130,21 @@ public class SearchService {
                 // TODO: include contributor count when data is available
                 return result;
             }).collect(Collectors.toList());
-            SearchResults searchResults = new SearchResults(totalCount, results,
-                SearchResult.SearchResultType.Project);
+            SearchResults searchResults = new SearchResults(totalCount, results, SearchResult.SearchResultType.Project);
             return Response.ok(searchResults).build();
         } catch (ParseException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GET
     @Path("/groups")
-    public Response searchGroups(
-            @QueryParam("q") @DefaultValue("") String query,
-            @DefaultValue("1") @QueryParam("page") int page,
+    public Response searchGroups(@QueryParam("q") @DefaultValue("") String query, @DefaultValue("1") @QueryParam("page") int page,
             @DefaultValue("20") @QueryParam("sizePerPage") int sizePerPage) {
 
+        if (applicationConfiguration.isLimitedAccessToGroups() && !identity.hasRole("admin")) {
 
-        if(applicationConfiguration.isLimitedAccessToGroups()
-        		&& !identity.hasRole("admin")){
-
-            SearchResults searchResults = new SearchResults(0, new ArrayList<SearchResult>() ,
-                    SearchResult.SearchResultType.Group);
+            SearchResults searchResults = new SearchResults(0, new ArrayList<SearchResult>(), SearchResult.SearchResultType.Group);
             return Response.ok(searchResults).build();
         }
 
@@ -166,93 +152,71 @@ public class SearchService {
         int totalCount;
         List<HIterationGroup> groups;
 
-        boolean includeObsolete =
-            identity.hasPermission("HIterationGroup", "view-obsolete");
+        boolean includeObsolete = identity.hasPermission("HIterationGroup", "view-obsolete");
 
-        final EntityStatus[] status =
-                includeObsolete ? new EntityStatus[] { EntityStatus.ACTIVE,
-                        EntityStatus.READONLY, EntityStatus.OBSOLETE }
-                        : new EntityStatus[] { EntityStatus.ACTIVE,
-                                EntityStatus.READONLY };
+        final EntityStatus[] status = includeObsolete ? new EntityStatus[] { EntityStatus.ACTIVE, EntityStatus.READONLY, EntityStatus.OBSOLETE }
+                : new EntityStatus[] { EntityStatus.ACTIVE, EntityStatus.READONLY };
 
         if (StringUtils.isEmpty(query)) {
             totalCount = versionGroupDAO.getAllGroupsCount(status);
-            groups = versionGroupDAO.getAllGroups(validatePageSize(sizePerPage),
-                    offset, status);
+            groups = versionGroupDAO.getAllGroups(validatePageSize(sizePerPage), offset, status);
         } else {
-            totalCount = versionGroupDAO.searchGroupBySlugAndNameCount(query,
-                    status);
-            groups = versionGroupDAO
-                    .searchGroupBySlugAndName(query,
-                            validatePageSize(sizePerPage), offset, status);
+            totalCount = versionGroupDAO.searchGroupBySlugAndNameCount(query, status);
+            groups = versionGroupDAO.searchGroupBySlugAndName(query, validatePageSize(sizePerPage), offset, status);
         }
         List<SearchResult> results = groups.stream().map(g -> {
-                GroupSearchResult result = new GroupSearchResult();
-                result.setId(g.getSlug());
-                result.setStatus(g.getStatus());
-                result.setTitle(g.getName());
-                result.setDescription(g.getDescription());
-                return result;
-            }).collect(Collectors.toList());
+            GroupSearchResult result = new GroupSearchResult();
+            result.setId(g.getSlug());
+            result.setStatus(g.getStatus());
+            result.setTitle(g.getName());
+            result.setDescription(g.getDescription());
+            return result;
+        }).collect(Collectors.toList());
 
-        SearchResults searchResults = new SearchResults(totalCount, results,
-                SearchResult.SearchResultType.Group);
+        SearchResults searchResults = new SearchResults(totalCount, results, SearchResult.SearchResultType.Group);
         return Response.ok(searchResults).build();
     }
 
     @GET
     @Path("/people")
-    public SearchResults searchPeople(
-        @QueryParam("q") @DefaultValue("") String query,
-        @DefaultValue("1") @QueryParam("page") int page,
-        @DefaultValue("20") @QueryParam("sizePerPage") int sizePerPage) {
+    public SearchResults searchPeople(@QueryParam("q") @DefaultValue("") String query, @DefaultValue("1") @QueryParam("page") int page,
+            @DefaultValue("20") @QueryParam("sizePerPage") int sizePerPage) {
 
-        if(applicationConfiguration.isLimitedAccessToPeople()
-        		&& !identity.hasRole("admin")){
-            return new SearchResults(0, new ArrayList<SearchResult>(), SearchResult.SearchResultType.Person);        	
-        }    	
+        if (applicationConfiguration.isLimitedAccessToPeople() && !identity.hasRole("admin")) {
+            return new SearchResults(0, new ArrayList<SearchResult>(), SearchResult.SearchResultType.Person);
+        }
 
         int offset = (validatePage(page) - 1) * validatePageSize(sizePerPage);
 
         int totalCount = personDAO.findAllContainingNameSize(query);
-        List<SearchResult> results = personDAO.findAllContainingName(query,
-                validatePageSize(sizePerPage), offset)
-            .stream().map(p -> {
-                PersonSearchResult result = new PersonSearchResult();
-                result.setId(p.getAccount().getUsername());
-                result.setDescription(p.getName());
-                result.setAvatarUrl(
-                    gravatarService.getUserImageUrl(50, p.getEmail()));
-                return result;
-            }).collect(Collectors.toList());
+        List<SearchResult> results = personDAO.findAllContainingName(query, validatePageSize(sizePerPage), offset).stream().map(p -> {
+            PersonSearchResult result = new PersonSearchResult();
+            result.setId(p.getAccount().getUsername());
+            result.setDescription(p.getName());
+            result.setAvatarUrl(gravatarService.getUserImageUrl(50, p.getEmail()));
+            return result;
+        }).collect(Collectors.toList());
         return new SearchResults(totalCount, results, SearchResult.SearchResultType.Person);
     }
 
     @GET
     @Path("/teams/language")
-    public SearchResults searchLanguageTeams(
-        @QueryParam("q") @DefaultValue("") String query,
-        @DefaultValue("1") @QueryParam("page") int page,
-        @DefaultValue("20") @QueryParam("sizePerPage") int sizePerPage) {
+    public SearchResults searchLanguageTeams(@QueryParam("q") @DefaultValue("") String query, @DefaultValue("1") @QueryParam("page") int page,
+            @DefaultValue("20") @QueryParam("sizePerPage") int sizePerPage) {
 
-        if(applicationConfiguration.isLimitedAccessToLanguages()
-        		&& !identity.hasRole("admin")){
-            return new SearchResults(0, new ArrayList<SearchResult>(),SearchResult.SearchResultType.LanguageTeam);        	
+        if (applicationConfiguration.isLimitedAccessToLanguages() && !identity.hasRole("admin")) {
+            return new SearchResults(0, new ArrayList<SearchResult>(), SearchResult.SearchResultType.LanguageTeam);
         }
 
         int offset = (validatePage(page) - 1) * validatePageSize(sizePerPage);
         int totalCount = localeDAO.countByNameLike(query);
-        List<SearchResult> results = localeDAO
-                .searchByName(query, validatePageSize(sizePerPage), offset)
-                .stream()
-            .map(l -> {
-                LanguageTeamSearchResult result =
-                    new LanguageTeamSearchResult();
-                result.setId(l.getLocaleId().getId());
-                result.setLocale(l.asULocale().getDisplayName());
-                result.setMemberCount(l.getMembers().size());
-                return result;
-            }).collect(Collectors.toList());
+        List<SearchResult> results = localeDAO.searchByName(query, validatePageSize(sizePerPage), offset).stream().map(l -> {
+            LanguageTeamSearchResult result = new LanguageTeamSearchResult();
+            result.setId(l.getLocaleId().getId());
+            result.setLocale(l.asULocale().getDisplayName());
+            result.setMemberCount(l.getMembers().size());
+            return result;
+        }).collect(Collectors.toList());
         return new SearchResults(totalCount, results, SearchResult.SearchResultType.LanguageTeam);
     }
 
@@ -261,7 +225,6 @@ public class SearchService {
     }
 
     private int validatePageSize(int sizePerPage) {
-        return (sizePerPage > MAX_RESULT) ? MAX_RESULT
-                : ((sizePerPage < 1) ? 1 : sizePerPage);
+        return (sizePerPage > MAX_RESULT) ? MAX_RESULT : ((sizePerPage < 1) ? 1 : sizePerPage);
     }
 }

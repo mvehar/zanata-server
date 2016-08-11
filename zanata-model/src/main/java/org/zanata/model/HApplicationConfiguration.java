@@ -22,21 +22,22 @@ package org.zanata.model;
 
 import java.lang.reflect.Field;
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
+
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
+
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Setter
@@ -73,6 +74,7 @@ public class HApplicationConfiguration extends ModelEntityBase {
     public static String KEY_PERMISSIONS_LIMIT_PROJECTS = "permissions.limit.projetcs";
     public static String KEY_PERMISSIONS_LIMIT_GROUPS = "permissions.limit.groups";
     public static String KEY_PERMISSIONS_LIMIT_LANGS = "permissions.limit.langs";
+    public static String KEY_PERMISSIONS_LIMIT_UPLOAD = "permissions.limit.upload";
 
     private static List<String> availableKeys;
 
@@ -104,20 +106,18 @@ public class HApplicationConfiguration extends ModelEntityBase {
             return availableKeys;
         }
         final HApplicationConfiguration dummy = new HApplicationConfiguration();
-        List<Field> availableConfigKeys =
-                Lists.newArrayList(HApplicationConfiguration.class.getFields());
-        availableKeys = Lists.transform(availableConfigKeys,
-                new Function<Field, String>() {
-                    @Override
-                    public String apply(Field input) {
-                        try {
-                            input.setAccessible(true);
-                            return (String) input.get(dummy);
-                        } catch (IllegalAccessException e) {
-                            throw Throwables.propagate(e);
-                        }
-                    }
-                });
+        List<Field> availableConfigKeys = Lists.newArrayList(HApplicationConfiguration.class.getFields());
+        availableKeys = Lists.transform(availableConfigKeys, new Function<Field, String>() {
+            @Override
+            public String apply(Field input) {
+                try {
+                    input.setAccessible(true);
+                    return (String) input.get(dummy);
+                } catch (IllegalAccessException e) {
+                    throw Throwables.propagate(e);
+                }
+            }
+        });
         return availableKeys;
     }
 }
