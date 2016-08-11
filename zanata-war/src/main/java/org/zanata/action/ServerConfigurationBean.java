@@ -123,8 +123,28 @@ public class ServerConfigurationBean implements Serializable {
     
     @Getter
     @Setter
-    private boolean strictPermissions;
-    private PropertyWithKey<Boolean> strictPermissionsProperty = new PropertyWithKey<Boolean>("strictPermissions", KEY_STRICT_PERMISSIONS);
+    private boolean requireLoginHomeSearch;
+    private PropertyWithKey<Boolean> requireLoginHomeSearchProperty = new PropertyWithKey<Boolean>("requireLoginHomeSearch", KEY_PERMISSIONS_REQUIRE_LOGIN_HOMESEARCH);
+
+    @Getter
+    @Setter
+    private boolean limitedAccessToProjects;
+    private PropertyWithKey<Boolean> limitedAccessToProjectsProperty = new PropertyWithKey<Boolean>("limitedAccessToProjects", KEY_PERMISSIONS_LIMIT_PROJECTS);
+
+    @Getter
+    @Setter
+    private boolean limitedAccessToPeople;
+    private PropertyWithKey<Boolean> limitedAccessToPeopleProperty = new PropertyWithKey<Boolean>("limitedAccessToPeople", KEY_PERMISSIONS_LIMIT_PEOPLE);
+
+    @Getter
+    @Setter
+    private boolean limitedAccessToGroups;
+    private PropertyWithKey<Boolean> limitedAccessToGroupsProperty = new PropertyWithKey<Boolean>("limitedAccessToGroups", KEY_PERMISSIONS_LIMIT_GROUPS);
+
+    @Getter
+    @Setter
+    private boolean limitedAccessToLangs;
+    private PropertyWithKey<Boolean> limitedAccessToLangsProperty = new PropertyWithKey<Boolean>("limitedAccessToLangs", KEY_PERMISSIONS_LIMIT_LANGS);
 
     @Getter
     @Setter
@@ -183,7 +203,11 @@ public class ServerConfigurationBean implements Serializable {
             new PropertyWithKey<String>("maxActiveRequestsPerApiKey", KEY_MAX_ACTIVE_REQ_PER_API_KEY),
             new PropertyWithKey<String>("maxFilesPerUpload", KEY_MAX_FILES_PER_UPLOAD),
             new PropertyWithKey<String>("displayUserEmail", KEY_DISPLAY_USER_EMAIL),
-            new PropertyWithKey<String>("strictPermissions", KEY_STRICT_PERMISSIONS),
+            new PropertyWithKey<String>("requireLoginHomeSearch", KEY_PERMISSIONS_REQUIRE_LOGIN_HOMESEARCH),
+            new PropertyWithKey<String>("limitedAccessToPeople", KEY_PERMISSIONS_LIMIT_PEOPLE),
+            new PropertyWithKey<String>("limitedAccessToProjects", KEY_PERMISSIONS_LIMIT_PROJECTS),
+            new PropertyWithKey<String>("limitedAccessToGroups", KEY_PERMISSIONS_LIMIT_GROUPS),
+            new PropertyWithKey<String>("limitedAccessToLangs", KEY_PERMISSIONS_LIMIT_LANGS),
             homeContentProperty
     );
 

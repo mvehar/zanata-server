@@ -127,7 +127,23 @@ public class DatabaseBackedConfig implements Serializable {
         return Boolean.valueOf(getConfigValue(HApplicationConfiguration.KEY_DISPLAY_USER_EMAIL));
     }
     
-    public boolean isStrictPermissions() {
-        return Boolean.valueOf(getConfigValue(HApplicationConfiguration.KEY_STRICT_PERMISSIONS));
+    public boolean isRequireLoginHomeSearch() {
+        return Boolean.valueOf(getConfigValue(HApplicationConfiguration.KEY_PERMISSIONS_REQUIRE_LOGIN_HOMESEARCH));
+    }
+    
+    public boolean isLimitedAccessToPeople() {
+        return Boolean.valueOf(getConfigValue(HApplicationConfiguration.KEY_PERMISSIONS_LIMIT_PEOPLE));
+    }
+    
+    public boolean isLimitedAccessToProjects() {
+        return Boolean.valueOf(getConfigValue(HApplicationConfiguration.KEY_PERMISSIONS_LIMIT_PROJECTS));
+    }
+    
+    public boolean isLimitedAccessToLanguages() {
+        return Boolean.valueOf(getConfigValue(HApplicationConfiguration.KEY_PERMISSIONS_LIMIT_LANGS));
+    }
+    
+    public boolean isLimitedAccessToGroups() {
+        return Boolean.valueOf(getConfigValue(HApplicationConfiguration.KEY_PERMISSIONS_LIMIT_GROUPS));
     }
 }

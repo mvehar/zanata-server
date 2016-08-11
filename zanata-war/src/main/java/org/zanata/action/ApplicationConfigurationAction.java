@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.zanata.ApplicationConfiguration;
 import org.zanata.rest.editor.dto.BuildInfo;
+import org.zanata.security.ZanataIdentity;
 import org.zanata.util.UrlUtil;
 
 /**
@@ -100,5 +101,11 @@ public class ApplicationConfigurationAction {
             return applicationConfiguration.getRegisterPath();
         }
         return "/account/register";
+    }
+    
+    public void restrictedToLoggedIn(ZanataIdentity identity){
+    	if(applicationConfiguration.isRequireLoginHomeSearch()){
+    		identity.checkLoggedIn();
+    	}
     }
 }

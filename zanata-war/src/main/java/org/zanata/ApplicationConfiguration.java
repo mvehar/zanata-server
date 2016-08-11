@@ -481,7 +481,24 @@ public class ApplicationConfiguration implements Serializable {
         return sysPropConfigStore.isOAuthEnabled();
     }
     
-    public boolean isStrictPermissions() {
-        return databaseBackedConfig.isStrictPermissions();
+    public boolean isRequireLoginHomeSearch() {
+        return databaseBackedConfig.isRequireLoginHomeSearch();
     }
+    
+    public boolean isLimitedAccessToProjects() {
+        return databaseBackedConfig.isLimitedAccessToProjects();
+    }
+    
+    public boolean isLimitedAccessToPeople() {
+        return databaseBackedConfig.isLimitedAccessToPeople();
+    }
+    
+    public boolean isLimitedAccessToLanguages() {
+        return databaseBackedConfig.isLimitedAccessToLanguages();
+    }
+    
+    public boolean isLimitedAccessToGroups() {
+        return databaseBackedConfig.isLimitedAccessToGroups();
+    }
+    
 }

@@ -67,7 +67,12 @@ public class HApplicationConfiguration extends ModelEntityBase {
     public static String KEY_MAX_CONCURRENT_REQ_PER_API_KEY = "max.concurrent.req.per.apikey";
     public static String KEY_MAX_ACTIVE_REQ_PER_API_KEY = "max.active.req.per.apikey";
     public static String KEY_MAX_FILES_PER_UPLOAD = "fileupload.max.files.per.upload";
-    public static String KEY_STRICT_PERMISSIONS = "permissions.strict";
+
+    public static String KEY_PERMISSIONS_REQUIRE_LOGIN_HOMESEARCH = "permissions.require.login.homesearch";
+    public static String KEY_PERMISSIONS_LIMIT_PEOPLE = "permissions.limit.people";
+    public static String KEY_PERMISSIONS_LIMIT_PROJECTS = "permissions.limit.projetcs";
+    public static String KEY_PERMISSIONS_LIMIT_GROUPS = "permissions.limit.groups";
+    public static String KEY_PERMISSIONS_LIMIT_LANGS = "permissions.limit.langs";
 
     private static List<String> availableKeys;
 

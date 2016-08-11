@@ -118,7 +118,7 @@ public class SearchService {
             }
 
             //TODO : Quickly fixed, should be refractored
-            if(applicationConfiguration.isStrictPermissions()){
+            if(applicationConfiguration.isLimitedAccessToProjects()){
             	int original_size = projects.size();
 
             	projects = projects.stream()
@@ -154,7 +154,7 @@ public class SearchService {
             @DefaultValue("20") @QueryParam("sizePerPage") int sizePerPage) {
 
 
-        if(applicationConfiguration.isStrictPermissions()
+        if(applicationConfiguration.isLimitedAccessToGroups()
         		&& !identity.hasRole("admin")){
 
             SearchResults searchResults = new SearchResults(0, new ArrayList<SearchResult>() ,
@@ -207,7 +207,7 @@ public class SearchService {
         @DefaultValue("1") @QueryParam("page") int page,
         @DefaultValue("20") @QueryParam("sizePerPage") int sizePerPage) {
 
-        if(applicationConfiguration.isStrictPermissions()
+        if(applicationConfiguration.isLimitedAccessToPeople()
         		&& !identity.hasRole("admin")){
             return new SearchResults(0, new ArrayList<SearchResult>(), SearchResult.SearchResultType.Person);        	
         }    	
@@ -235,7 +235,7 @@ public class SearchService {
         @DefaultValue("1") @QueryParam("page") int page,
         @DefaultValue("20") @QueryParam("sizePerPage") int sizePerPage) {
 
-        if(applicationConfiguration.isStrictPermissions()
+        if(applicationConfiguration.isLimitedAccessToLanguages()
         		&& !identity.hasRole("admin")){
             return new SearchResults(0, new ArrayList<SearchResult>(),SearchResult.SearchResultType.LanguageTeam);        	
         }

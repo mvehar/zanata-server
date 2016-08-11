@@ -7,7 +7,9 @@
   xmlns:f="http://java.sun.com/jsf/core"
   xmlns:ds="http://deltaspike.apache.org/jsf">
   
-  <ui:fragment rendered="#{!applicationConfiguration.isStrictPermissions() || identity.checkLoggedIn()}"/>
+  <f:metadata>
+    <f:event type="preRenderView" listener="#{applicationConfigurationAction.restrictedToLoggedIn(identity)}"/>
+  </f:metadata>
 
   <html class="no-js Ff(zsans) Lh(1.5) Bgc(#fff) Fz(16px)">
   <h:head>

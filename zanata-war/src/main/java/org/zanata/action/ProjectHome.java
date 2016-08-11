@@ -736,7 +736,7 @@ public class ProjectHome extends SlugHome<HProject> implements
         validateSuppliedId();
         
         //TODO: Setup permissions config
-    	if(applicationConfiguration.isStrictPermissions()){
+    	if(applicationConfiguration.isLimitedAccessToProjects()){
             HProject instance = getInstance();
             identity.checkPermission(instance, "read");
     	}
