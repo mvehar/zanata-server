@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import Icon from '../Icon'
+import { Icon } from 'zanata-ui'
 import IconButton from '../IconButton'
 import React, { PropTypes } from 'react'
 
@@ -68,7 +68,7 @@ const SuggestionSearchInput = React.createClass({
   loadingResultsElement: function () {
     return (
       <span onClick={this.focusInput}
-            className="Editor-suggestionsSearchLoader">
+        className="Editor-suggestionsSearchLoader">
         {/* TODO proper loader */}
         Loading…
       </span>
@@ -78,7 +78,7 @@ const SuggestionSearchInput = React.createClass({
   resultCountElement: function () {
     return (
       <span onClick={this.focusInput}
-            className="Editor-suggestionsSearchResults">
+        className="Editor-suggestionsSearchResults">
         {this.props.resultCount} results
       </span>
     )
@@ -104,13 +104,11 @@ const SuggestionSearchInput = React.createClass({
     if (!this.props.hasSearch) {
       return undefined
     }
-    // FIXME need to not use Icon--sm style for this one
-    //       maybe use a size property with default of small
     return (
       <span className="InputGroup-addon">
         <IconButton icon="cross"
                     title="Clear search"
-                    iconClass="Icon--xsm"
+                    iconSize="n1"
                     onClick={this.clearSearch}/>
       </span>
     )
@@ -121,18 +119,18 @@ const SuggestionSearchInput = React.createClass({
       <div className={cx('InputGroup InputGroup--outlined InputGroup--rounded',
                          { 'is-focused': this.state.focused })}>
         <span className="InputGroup-addon"
-              onClick={this.focusInput}>
+          onClick={this.focusInput}>
           <Icon name="search"
                 title="Search suggestions"
-                className="Icon--xsm"/>
+                size="n1"/>
         </span>
         <input ref="input"
-               type="search"
-               placeholder="Search suggestions…"
-               maxLength="1000"
-               value={this.props.text}
-               onChange={this.props.onTextChange}
-               className="InputGroup-input u-sizeLineHeight-1_1-4"/>
+          type="search"
+          placeholder="Search suggestions…"
+          maxLength="1000"
+          value={this.props.text}
+          onChange={this.props.onTextChange}
+          className="InputGroup-input u-sizeLineHeight-1_1-4" />
         {this.resultsElement()}
         {this.clearButtonElement()}
       </div>

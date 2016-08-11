@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import Icon from '../../components/Icon'
+import { Icon } from 'zanata-ui'
 import KeyCombinations from '../../components/KeyCombinations'
 import { chain, each, map } from 'lodash'
 import { connect } from 'react-redux'
@@ -46,7 +46,7 @@ const KeyShortcutCheatSheet = React.createClass({
     return (
       <li className="Grid" key={keys.join()}>
         <div className="Grid-cell u-size1of2 u-sPR-1-4 u-sPV-1-4 u-textRight">
-          <KeyCombinations keys={keys}/>
+          <KeyCombinations keys={keys} />
         </div>
         <div className="Grid-cell u-size1of2 u-sPL-1-4 u-sPV-1-4">
           {shortcut.description}

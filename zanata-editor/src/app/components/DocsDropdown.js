@@ -1,6 +1,6 @@
 import { encode } from '../utils/doc-id'
 import Dropdown from './Dropdown'
-import Icon from './Icon'
+import { Icon } from 'zanata-ui'
 import React, { PropTypes } from 'react'
 
 /**
@@ -50,12 +50,13 @@ const DocsDropdown = React.createClass({
 
     return (
       <Dropdown onToggle={this.props.toggleDropdown}
-                isOpen={this.props.isOpen}>
+        isOpen={this.props.isOpen}>
         <Dropdown.Button>
           <button className="Link--invert">
             {selectedDoc}
-            <Icon name="chevron-down"
-                  className="Icon--sm Dropdown-toggleIcon u-sML-1-8"/>
+            <div className="u-sML-1-8 Dropdown-toggleIcon">
+              <Icon name="chevron-down" size="1" />
+            </div>
           </button>
         </Dropdown.Button>
         <Dropdown.Content>

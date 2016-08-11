@@ -1,7 +1,7 @@
 import { dashboardUrl } from '../api'
 import cx from 'classnames'
 import { some } from 'lodash'
-import LogoLoader from '../components/LogoLoader'
+import { LogoLoader } from 'zanata-ui'
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 
@@ -16,7 +16,7 @@ const ZanataLogoLoader = ({ inverted, loading }) => {
   return (
     <a className={className}
       href={dashboardUrl}>
-      <LogoLoader {...{ inverted, loading }}/>
+      <LogoLoader {...{ inverted, loading }} />
     </a>
   )
 }

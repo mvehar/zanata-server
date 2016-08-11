@@ -489,7 +489,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-deploy-plugin</artifactId>
-        <!-- zanata war is too big to deploy, especially with five variants -->
+        <!-- zanata war is too big to deploy to Maven repos -->
         <configuration>
           <!-- MEAD builds must deploy all artifacts, so we run them with -Dallow.deploy.skip=false -->
           <skip>${allow.deploy.skip}</skip>
@@ -1220,7 +1220,7 @@
                 </goals>
                 <configuration>
                   <target unless="skipArqTests">
-                    <copy overwrite="true" file="${project.basedir}/src/test/resources/arquillian/standalone-arquillian-wildfly.xml" tofile="${appserver.home}/standalone/configuration/standalone.xml" />
+                    <copy overwrite="true" file="${project.basedir}/src/test/resources/arquillian/standalone-arquillian-wildfly.xml" tofile="${appserver.home}/standalone/configuration/standalone-arquillian.xml" />
                   </target>
                 </configuration>
               </execution>
@@ -1232,7 +1232,7 @@
             <configuration>
               <systemPropertyVariables>
                 <!-- NB this is a container qualifier in arquillian.xml -->
-                <arquillian.launch>wildfly81</arquillian.launch>
+                <arquillian.launch>wildfly</arquillian.launch>
               </systemPropertyVariables>
             </configuration>
           </plugin>
@@ -1860,7 +1860,7 @@
     <dependency>
       <groupId>net.bull.javamelody</groupId>
       <artifactId>javamelody-core</artifactId>
-      <version>1.52.0</version>
+      <version>1.60.0</version>
     </dependency>
 
     <dependency>
@@ -1964,6 +1964,7 @@
       <groupId>org.infinispan</groupId>
       <artifactId>infinispan-core</artifactId>
       <version>${infinispan.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- These two are being explicitly added as jboss-as-parent

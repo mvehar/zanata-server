@@ -76,7 +76,10 @@ public class ZanataOpenId implements OpenIdAuthCallback, Serializable {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(ZanataOpenId.class);
 
+    @Inject
     private ZanataIdentity identity;
+
+    @Inject
     private ApplicationConfiguration applicationConfiguration;
 
     @Inject
@@ -186,10 +189,22 @@ public class ZanataOpenId implements OpenIdAuthCallback, Serializable {
     @Transactional
     public String verifyResponse(HttpServletRequest httpReq) {
         try {
-            // extract the parameters from the authentication response
-            // (which comes in as a HTTP request from the OpenID providerType)
+            // clear any previous messages which might have been generated
+            // before the openId authentication took place
+            facesMessages.clear();
+            /**
+             * extract the parameters from the authentication response query string
+             * (which comes in as a HTTP request from the OpenID providerType)
+             * instead of from httpReq.getParameterMap() to make sure params
+             * is encoded correctly bypassing default servlets encoding.
+             *
+             * httpReq.getParameterMap() failed check in
+             * {@link org.openid4java.consumer.ConsumerManager#verifySignature}
+             * due to the unicode encoding in URI is different from signature.
+             * Reported issue: https://zanata.atlassian.net/browse/ZNTA-1275
+             */
             ParameterList respParams =
-                    new ParameterList(httpReq.getParameterMap());
+                ParameterList.createFromQueryString(httpReq.getQueryString());
             AuthSuccess authSuccess = AuthSuccess.createAuthSuccess(respParams);
 
             // strip existing params (eg dswid)
@@ -257,12 +272,6 @@ public class ZanataOpenId implements OpenIdAuthCallback, Serializable {
         discovered = null;
         id = null;
         authResult = new OpenIdAuthenticationResult();
-        // TODO inject these
-        identity =
-                ServiceLocator.instance().getInstance(ZanataIdentity.class);
-        applicationConfiguration =
-                ServiceLocator.instance().getInstance(
-                        ApplicationConfiguration.class);
     }
 
     private void loginImmediate() {

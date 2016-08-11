@@ -10,6 +10,7 @@ import { requestPhraseDetail } from '../../actions/phrases'
 import { fetchHeaderInfo, fetchUiLocales } from '../../actions/headerActions'
 import { saveSuggestionPanelHeight } from '../../actions/suggestions'
 import SplitPane from 'react-split-pane'
+import { Icons } from 'zanata-ui'
 
 /**
  * Top level of Zanata view hierarchy.
@@ -71,16 +72,17 @@ class Root extends Component {
     return (
       <ParamPropDispatcher {...this.props}>
         <KeyShortcutDispatcher className="Editor is-suggestions-active">
-          <EditorHeader/>
+          <Icons />
+          <EditorHeader />
           <SplitPane ref="suggestionResizer"
             split="horizontal"
             defaultSize={pixelHeight}
             primary="second"
             onDragFinished={this.resizeFinished}>
-            <MainContent/>
+            <MainContent />
             {this.props.showSuggestion && <SuggestionsPanel />}
           </SplitPane>
-          <KeyShortcutCheatSheet/>
+          <KeyShortcutCheatSheet />
         </KeyShortcutDispatcher>
       </ParamPropDispatcher>
     )
@@ -89,7 +91,10 @@ class Root extends Component {
 
 Root.propTypes = {
   percentHeight: PropTypes.number.isRequired,
-  showSuggestion: PropTypes.bool
+  showSuggestion: PropTypes.bool,
+  requestUiLocales: PropTypes.func.isRequired,
+  requestHeaderInfo: PropTypes.func.isRequired,
+  saveSuggestionPanelHeight: PropTypes.func.isRequired
 }
 
 function mapStateToProps (state, ownProps) {
